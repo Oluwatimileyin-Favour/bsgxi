@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { Player, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -8,9 +8,8 @@ export async function POST(req: Request) {
     const { body } = await req.json();
 
     if(body.action === "adminSelectNominees"){
-      const playerids = body.nominees.map(nominee => nominee.playerID);
-
-      const updatedRecords = await prisma.gameweekStats.updateMany({
+      const playerids = body.nominees.map((nominee: Player) => nominee.playerID);
+      const updatedRecords = await prisma.gameweekStat.updateMany({
         where: {
           playerID: { in: playerids } 
         },
@@ -25,7 +24,7 @@ export async function POST(req: Request) {
     else if(body.action === "playerSelectNominee"){
       
 
-      const updatedMotmNomination = await prisma.gameweekStats.update({
+      const updatedMotmNomination = await prisma.gameweekStat.update({
         where: {
           GameweekStatID: body.payload.gameweekStatId
         },
@@ -41,6 +40,6 @@ export async function POST(req: Request) {
   
   catch (error) {
     console.log(error)
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: error }, { status: 500 });
   }
 }

@@ -1,8 +1,10 @@
-export default function BallondOrBoard({rankings}){
+import { Player } from "@prisma/client";
+
+export default function BallondOrBoard({rankings}: {rankings: Player[]}){
 
     return (
       <div className="w-[350px] bg-white shadow-lg rounded-xl p-4">
-        <h2 className="text-2xl font-bold text-center text-rose-500 mb-3">Road to Ballon d'Or 🏆</h2>
+        <h2 className="text-2xl font-bold text-center text-rose-500 mb-3">Road to Ballon d&apos;Or 🏆</h2>
         <div className="h-[400px] overflow-y-auto">
           <ul className="space-y-2">
             {rankings.map((player, index) => (

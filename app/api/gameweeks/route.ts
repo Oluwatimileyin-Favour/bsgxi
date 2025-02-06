@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const { body } = await req.json();
 
     if(body.action === "activateGameweek"){
-      const createdGameweek = await prisma.gameweeks.create(
+      const createdGameweek = await prisma.gameweek.create(
           {data: body.payload.gameweek}
       );
 
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     else if(body.action === "closeGameweek"){
 
-      const gameweekStats = await prisma.gameweekStats.findMany({where: {
+      const gameweekStats = await prisma.gameweekStat.findMany({where: {
         gameweekID: body.payload.gameweekID
       }})
 
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       nominees = nominees.filter(nominee => nominee != null)
 
       const goalsTransactions = gameweekStats.map((gameweekStat) =>
-        prisma.players.update({
+        prisma.player.update({
           where: { playerID: gameweekStat.playerID },
           data: { totalgoals: {increment: gameweekStat.goals_scored ?? 0} },
         })
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       await prisma.$transaction(goalsTransactions);
 
       const pointsTransactions = gameweekStats.map((gameweekStat) =>
-        prisma.players.update({
+        prisma.player.update({
           where: { playerID: gameweekStat.playerID },
           data: { totalpoints: {increment: gameweekStat.points ?? 0} },
         })
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       const motm = findMostFrequent(nominees);
 
       if(motm){
-          await prisma.gameweeks.update({
+          await prisma.gameweek.update({
             where: { gameweekID: body.payload.gameweekID },
             data: {motm: motm}
           })
@@ -55,22 +55,22 @@ export async function POST(req: Request) {
           const nomineeSet = [...new Set(nominees)]
           
           nomineeSet.map(async (nominee) => {
-            let gameweekStatId = gameweekStats.find(gameweekStat => gameweekStat.playerID == nominee)
+            const gameweekStatId = gameweekStats.find(gameweekStat => gameweekStat.playerID == nominee)
             if(nominee != motm){
-              await prisma.gameweekStats.update({
+              await prisma.gameweekStat.update({
                 where: { GameweekStatID: gameweekStatId?.GameweekStatID },
                 data: { points: 1 },
               })
             }
             else{
-              await prisma.gameweekStats.update({
+              await prisma.gameweekStat.update({
                 where: { GameweekStatID: gameweekStatId?.GameweekStatID },
                 data: { points: 3 },
               })
             }
         });
 
-        await prisma.gameweeks.update({
+        await prisma.gameweek.update({
           where: { gameweekID: body.payload.gameweekID },
           data: {isactive: false}
         })
@@ -79,6 +79,6 @@ export async function POST(req: Request) {
     }
     
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: error }, { status: 500 });
   }
 }

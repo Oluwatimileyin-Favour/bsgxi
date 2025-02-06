@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Gameweeks {
+model Gameweek {
   gameweekID    Int             @id(map: "PK_Gameweeks") @db.TinyInt
   date          DateTime        @db.Date
   isactive      Boolean
@@ -15,11 +15,13 @@ model Gameweeks {
   whitescore    Int?            @db.TinyInt
   blackscore    Int?            @db.TinyInt
   motm          Int?            @db.SmallInt
-  Players       Players?        @relation(fields: [motm], references: [playerID], onUpdate: NoAction, map: "FK_motm")
-  GameweekStats GameweekStats[]
+  Players       Player?        @relation(fields: [motm], references: [playerID], onUpdate: NoAction, map: "FK_motm")
+  GameweekStats GameweekStat[]
+
+  @@map("gameweeks")
 }
 
-model GameweekStats {
+model GameweekStat {
   GameweekStatID                           Int       @id(map: "PK__Gameweek__9ACAB8379B3E8BF3") @default(autoincrement()) @db.SmallInt
   gameweekID                               Int       @db.TinyInt
   playerID                                 Int       @db.SmallInt
@@ -28,12 +30,14 @@ model GameweekStats {
   nomineeID                                Int?      @db.SmallInt
   points                                   Int?      @db.TinyInt
   nominated                                Boolean?  @default(false, map: "DF__GameweekS__nomin__2739D489")
-  Gameweeks                                Gameweeks @relation(fields: [gameweekID], references: [gameweekID], onUpdate: NoAction, map: "FK_GameweekStats_Gameweeks")
-  Players_GameweekStats_nomineeIDToPlayers Players?  @relation("GameweekStats_nomineeIDToPlayers", fields: [nomineeID], references: [playerID], onDelete: NoAction, onUpdate: NoAction, map: "FK_gameweekstats_nominee")
-  Players                                  Players   @relation(fields: [playerID], references: [playerID], onUpdate: NoAction, map: "FK__GameweekS__playe__6C190EBB")
+  Gameweeks                                Gameweek @relation(fields: [gameweekID], references: [gameweekID], onUpdate: NoAction, map: "FK_GameweekStats_Gameweeks")
+  Players_GameweekStats_nomineeIDToPlayers Player?  @relation("GameweekStats_nomineeIDToPlayers", fields: [nomineeID], references: [playerID], onDelete: NoAction, onUpdate: NoAction, map: "FK_gameweekstats_nominee")
+  Players                                  Player   @relation(fields: [playerID], references: [playerID], onUpdate: NoAction, map: "FK__GameweekS__playe__6C190EBB")
+
+  @@map("gameweekStats")
 }
 
-model Players {
+model Player {
   playerID                                       Int             @id(map: "PK_playerID") @db.SmallInt
   code                                           String          @unique(map: "UQ_Players_code") @db.NChar(5)
   firstname                                      String          @db.NVarChar(50)
@@ -42,9 +46,11 @@ model Players {
   totalgoals                                     Int?            @db.SmallInt
   monthpoints                                    Int?            @db.SmallInt
   monthvotes                                     Int?            @db.SmallInt
-  Gameweeks                                      Gameweeks[]
-  GameweekStats_GameweekStats_nomineeIDToPlayers GameweekStats[] @relation("GameweekStats_nomineeIDToPlayers")
-  GameweekStats                                  GameweekStats[]
+  Gameweeks                                      Gameweek[]
+  GameweekStats_GameweekStats_nomineeIDToPlayers GameweekStat[] @relation("GameweekStats_nomineeIDToPlayers")
+  GameweekStats                                  GameweekStat[]
+
+  @@map("players")
 }
 
 model sysdiagrams {

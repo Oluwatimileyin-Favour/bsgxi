@@ -1,19 +1,18 @@
 'use client'
 
-import { Gameweeks } from "@prisma/client";
 import { useState, useRef } from "react";
+import { Player, Gameweek } from "@prisma/client";
 
+export default function ActivateGameweek({playerList, nextGameweek }: { playerList: Player[] , nextGameweek: number}) {
 
-export default function ActivateGameweek({playerList, nextGameweek}) {
-
-    const [players, updatePlayerList] = useState(playerList);
-    const [teamblack, updateTeamBlack] = useState([]);
-    const [teamwhite, updateTeamWhite] = useState([]);
-    const [whiteTurn, updateTurn] = useState([true]);
+    const [players, updatePlayerList] = useState<Player[]>(playerList);
+    const [teamblack, updateTeamBlack] = useState<Player[]>([]);
+    const [teamwhite, updateTeamWhite] = useState<Player[]>([]);
+    const [whiteTurn, updateTurn] = useState<boolean>(true);
     
     const dateRef = useRef<HTMLInputElement | null>(null);
 
-    const onclickplayer = (chosenPlayer) => {
+    const onclickplayer = (chosenPlayer: Player) => {
         const updatePlayers = players.filter(player => player.playerID != chosenPlayer.playerID);
         const updateblack = [...teamblack, chosenPlayer];
         const updatewhite = [...teamwhite, chosenPlayer];
@@ -38,7 +37,7 @@ export default function ActivateGameweek({playerList, nextGameweek}) {
         }
     }
 
-    const onclickChosenPlayer = (chosenPlayer, team) => {
+    const onclickChosenPlayer = (chosenPlayer: Player, team: number) => {
         const updatePlayers = [...players, chosenPlayer];
 
         updatePlayerList(updatePlayers);
@@ -57,13 +56,14 @@ export default function ActivateGameweek({playerList, nextGameweek}) {
 
     const activateGameweek = async () => {
 
-        const gameweek: Gameweeks = {
+        const gameweek: Gameweek = {
             gameweekID: nextGameweek,
-            date: new Date(dateRef.current?.value) ?? new Date(),
+            date: new Date(dateRef.current?.value ?? "") ?? new Date(),
             isactive: true,
             gametype: "Regular",
             whitescore: 0,
-            blackscore: 0
+            blackscore: 0,
+            motm: null
         }
             
         const body = {action: "activateGameweek", payload: gameweek}

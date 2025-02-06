@@ -1,6 +1,4 @@
-import PlayerList from './playerList';
-import Gameweek from './Gameweek';
-import { Gameweeks, GameweekStats, PrismaClient } from "@prisma/client";
+import {GameweekStat, PrismaClient } from "@prisma/client";
 import Teamsheet from "./Teamsheet";
 import GoldenBootBoard from "./GoldenBootBoard";
 import BallondOrBoard from "./BallondOrBoard";
@@ -9,15 +7,15 @@ const prisma = new PrismaClient();
 
 export default async function HomePage() {
 
-    const players = await prisma.players.findMany();
-    const gameweeks = await prisma.gameweeks.findMany();
+    const players = await prisma.player.findMany();
+    const gameweeks = await prisma.gameweek.findMany();
 
-    let lastGameweek = gameweeks.length - 1;
-    let teamBlack: GameweekStats[] = []
-    let teamWhite: GameweekStats[] = []
+    const lastGameweek = gameweeks.length - 1;
+    let teamBlack: GameweekStat[] = []
+    let teamWhite: GameweekStat[] = []
 
     if(lastGameweek >= 0){
-        const gameweekStats = await prisma.gameweekStats.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
+        const gameweekStats = await prisma.gameweekStat.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
  
         teamBlack = gameweekStats.filter(stat => {
             return stat.teamID === false
@@ -28,8 +26,8 @@ export default async function HomePage() {
         })
     }
 
-    const sortedByGoals = [...players].sort((a, b) => (b.totalgoals || 0) - (a.totalgoals || 0));
-    const sortedByPoints = [...players].sort((a, b) => (b.totalpoints || 0) - (a.totalpoints || 0));
+    const sortedPlayersByGoals = [...players].sort((a, b) => (b.totalgoals || 0) - (a.totalgoals || 0));
+    const sortedPlayersByPoints = [...players].sort((a, b) => (b.totalpoints || 0) - (a.totalpoints || 0));
 
     return (
         <>
@@ -42,8 +40,8 @@ export default async function HomePage() {
                         <Teamsheet players={players} gameweek={gameweeks[lastGameweek]} teamBlack={teamBlack} teamWhite={teamWhite}></Teamsheet>
                     </div>   
                     <div className="flex space-x-4">
-                        <GoldenBootBoard rankings={sortedByGoals}></GoldenBootBoard>
-                        <BallondOrBoard rankings={sortedByPoints}></BallondOrBoard>
+                        <GoldenBootBoard rankings={sortedPlayersByGoals}></GoldenBootBoard>
+                        <BallondOrBoard rankings={sortedPlayersByPoints}></BallondOrBoard>
                     </div>
 
                 </div>

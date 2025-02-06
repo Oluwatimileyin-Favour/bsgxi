@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const { scores } = await req.json();
 
-    const updatedGameweek = await prisma.gameweeks.update({
+    const updatedGameweek = await prisma.gameweek.update({
         where: { gameweekID: scores.currentGameweek.gameweekID }, 
         data: { whitescore: parseInt(scores.whitescore),
             blackscore: parseInt(scores.blackscore)
@@ -19,6 +19,6 @@ export async function POST(req: Request) {
   } 
   
   catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: error }, { status: 500 });
   }
 }

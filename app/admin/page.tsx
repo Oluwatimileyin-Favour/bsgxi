@@ -1,4 +1,4 @@
-import { Players, PrismaClient } from '@prisma/client';
+import { Player, PrismaClient } from '@prisma/client';
 import ActivateGameweek from "./ActivateGameweek";
 import ManageGameweek from './ManageGameweek';
 
@@ -6,20 +6,20 @@ const prisma = new PrismaClient();
 
 export default async function page(){
 
-    const allplayers = await prisma.players.findMany();
-    const gameweeks = await prisma.gameweeks.findMany();
+    const allplayers = await prisma.player.findMany();
+    const gameweeks = await prisma.gameweek.findMany();
 
-    let lastGameweek = 0;
-    let lastGameweekIsActive = false;
-    let gameweekPlayers:Players = [];
-    let nomineeList: Players = [];
-    let nominatedPlayers = false;
+    let lastGameweek: number = 0;
+    let lastGameweekIsActive: boolean = false;
+    let gameweekPlayers: Player[] = [];
+    let nomineeList: Player[] = [];
+    let haveNominatedPlayers: boolean = false;
     
     if(gameweeks.length > 0){
         lastGameweek = gameweeks.length - 1;
         lastGameweekIsActive = gameweeks[lastGameweek].isactive;
 
-        const gameweekStats = await prisma.gameweekStats.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
+        const gameweekStats = await prisma.gameweekStat.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
         const gameweekPlayersIds = gameweekStats.map(gameweekStat => gameweekStat.playerID);
     
         gameweekPlayers = allplayers.filter(player => gameweekPlayersIds.includes(player.playerID));
@@ -28,7 +28,7 @@ export default async function page(){
         const nomineesIDs = [...new Set(nominees.map(nominee => nominee.playerID))]
         nomineeList = gameweekPlayers.filter(player => nomineesIDs.includes(player.playerID));
         if(nomineeList.length > 0){
-            nominatedPlayers = true;
+            haveNominatedPlayers = true;
         }
     }
 
@@ -41,7 +41,7 @@ export default async function page(){
            
             {
                 lastGameweekIsActive &&
-                <ManageGameweek gameweekPlayerList={gameweekPlayers} gameweek={gameweeks[lastGameweek]} nomineeList={nomineeList} nominatedPlayers={nominatedPlayers}></ManageGameweek>
+                <ManageGameweek gameweekPlayerList={gameweekPlayers} gameweek={gameweeks[lastGameweek]} nomineeList={nomineeList} haveNominatedPlayers={haveNominatedPlayers}></ManageGameweek>
             }
         </div>
        

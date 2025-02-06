@@ -2,20 +2,21 @@
 
 import { useState, useRef } from "react";
 import clsx from "clsx";
+import { Gameweek, GameweekStat, Player } from "@prisma/client";
 
-export default function Teamsheet({players, gameweek, teamBlack, teamWhite}){
+export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {players: Player[], gameweek: Gameweek, teamBlack: GameweekStat[], teamWhite: GameweekStat[]}){
 
-    const [chosenPlayerStats, updateChosenPlayerStats] = useState(teamBlack[0]);
-    const [isPlayerSelected, updateSelectionStatus] = useState(false);
-    const [nominateForMotm, updateNominateForMotmStatus] = useState(false);
-    const [enterGoals, updateEnterGoalsStatus] = useState(false);
+    const [chosenPlayerStats, updateChosenPlayerStats] = useState<GameweekStat>(teamBlack[0]);
+    const [isPlayerSelected, updateSelectionStatus] = useState<boolean>(false);
+    const [nominateForMotm, updateNominateForMotmStatus] = useState<boolean>(false);
+    const [enterGoals, updateEnterGoalsStatus] = useState<boolean>(false);
 
     const goalsScoredRef = useRef<HTMLInputElement>(null);
     const playerCodeRef = useRef<HTMLInputElement>(null);
     
-    let chosenPlayer = players.find(player => player.playerID === chosenPlayerStats.playerID)
+    const chosenPlayer = players.find(player => player.playerID === chosenPlayerStats.playerID)
 
-    const handleClick = (stats) => {
+    const handleClick = (stats: GameweekStat) => {
         if(gameweek.isactive){
             updateChosenPlayerStats(stats)
             updateSelectionStatus(!isPlayerSelected)
@@ -25,8 +26,8 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}){
        }
     }
 
-    const updateGoals = async (e) => {
-        e.preventDefault(); // Prevent page refresh
+    const updateGoals = async (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
         if(players.find(player => player.code === playerCodeRef.current?.value)){
             const goals = {gameweekStatId: chosenPlayerStats.GameweekStatID, goalsScored: goalsScoredRef.current?.value};
             try {
@@ -55,7 +56,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}){
         resetChoices();
     };
 
-    const handleNomination = async (e) => {
+    const handleNomination = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
         const nominator = players.find(player => player.code === playerCodeRef.current?.value);
@@ -66,7 +67,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}){
             console.log(gameweekStat)
     
     
-            const nominationPair = {gameweekStatId: gameweekStat.GameweekStatID, nomineeId: chosenPlayer.playerID};
+            const nominationPair = {gameweekStatId: gameweekStat?.GameweekStatID, nomineeId: chosenPlayer?.playerID};
 
             const body = {action: "playerSelectNominee", payload: nominationPair}; 
             
@@ -171,7 +172,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}){
                         htmlFor="textInput"
                         className="block text-lg font-bold text-red-700 mb-2"
                         >
-                        {chosenPlayer.firstname}
+                        {chosenPlayer?.firstname}
                         </label>
                         <label
                         htmlFor="textInput"
@@ -221,7 +222,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}){
                         htmlFor="textInput"
                         className="block text-lg font-bold text-red-700 mb-2"
                         >
-                        Are you sure you want to nominate {chosenPlayer.firstname} for MOTM?
+                        Are you sure you want to nominate {chosenPlayer?.firstname} for MOTM?
                         </label>
                         <input
                         type="text"

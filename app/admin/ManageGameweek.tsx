@@ -2,8 +2,9 @@
 
 import { useState, useRef } from "react"
 import generateCode from "../util/generateCode";
+import { Player, Gameweek } from "@prisma/client";
 
-export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeList, nominatedPlayers}){
+export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeList, haveNominatedPlayers}: {gameweekPlayerList: Player[], gameweek: Gameweek, nomineeList: Player[], haveNominatedPlayers: boolean}){
 
     const [nominees, updateNominees] = useState(nomineeList)
     const [gameweekPlayers, updateGameweekPlayers] = useState(gameweekPlayerList);
@@ -16,8 +17,8 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
 
     const adminCode =  generateCode();
 
-    const onclickplayer = (player) => {
-        if(!nominatedPlayers){
+    const onclickplayer = (player: Player) => {
+        if(!haveNominatedPlayers){
             const nomineesUpdate = [...nominees, player];
             const gameweekPlayersUpdate = gameweekPlayers.filter(gameweekPlayer => gameweekPlayer.playerID != player.playerID);
     
@@ -26,8 +27,8 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
         }
     }
 
-    const onclickChosenPlayer = (nominee) => {
-        if(!nominatedPlayers){
+    const onclickChosenPlayer = (nominee: Player) => {
+        if(!haveNominatedPlayers){
             const nomineesUpdate = nominees.filter(player => player.playerID != nominee.playerID);
             const gameweekPlayersUpdate = [...gameweekPlayers, nominee];
     
@@ -36,7 +37,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
         }  
     }
 
-    const handleCloseGameweek = async (e) => {
+    const handleCloseGameweek = async (e: { preventDefault: () => void; }) => {
 
         if(adminCodeRef.current?.value != adminCode){
             alert("Incorrect Code");
@@ -71,7 +72,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
         updateNominatePlayersStatus(false);
     }
 
-    const saveNominations = async (e) => {
+    const saveNominations = async (e: { preventDefault: () => void; }) => {
 
         if(adminCodeRef.current?.value != adminCode){
             alert("Incorrect Code");
@@ -139,7 +140,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                 !closeGameweek && !nominatePlayers &&
                 <>
                     {
-                        !nominatedPlayers &&
+                        !haveNominatedPlayers &&
                         <div className="w-[500px] h-[500px] overflow-y-auto bg-gray-100 p-4 rounded-lg shadow-md">
                             <h3 className="text-center font-bold text-xl text-rose-900">Click on player to nominate for MOTM</h3>
                             <ul className="space-y-2">
@@ -162,7 +163,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                                 </li>
                             ))}
                         </ul>
-                            { !nominatedPlayers &&
+                            { !haveNominatedPlayers &&
                                 <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-10 w-50 my-auto"
                                     onClick={() => updateNominatePlayersStatus(true)}
                                 >
@@ -192,7 +193,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                                 ref={whiteScoreRef}
                                 name="textInput"
                                 placeholder="team white"
-                                defaultValue={gameweek.whitescore}
+                                defaultValue={gameweek.whitescore ?? 0}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
 
@@ -202,7 +203,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                                 ref={blackScoreRef}
                                 name="textInput"
                                 placeholder="team black"
-                                defaultValue={gameweek.blackscore}
+                                defaultValue={gameweek.blackscore ?? 0}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
 
@@ -234,7 +235,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
             }
 
             {
-                nominatePlayers &&
+                haveNominatedPlayers &&
 
                 <div className="flex h-[500px] w-[700px]">
                         <ul>
@@ -272,7 +273,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                                 type="submit"
                                 className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                I'm sure
+                                I&apos;m sure
                             </button>
                             <button
                                 className="w-full my-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -311,7 +312,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                         type="submit"
                         className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                        I'm sure
+                        I&apos;m sure
                     </button>
                     <button
                         className="w-full my-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"

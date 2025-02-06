@@ -1,5 +1,6 @@
+import { Player } from "@prisma/client";
 
-export default function GoldenBootBoard({rankings}){
+export default function GoldenBootBoard({rankings}: {rankings: Player[]}){
 
         return (
           <div className="w-[350px] bg-white shadow-lg rounded-xl p-4">
