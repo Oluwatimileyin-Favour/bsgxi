@@ -235,7 +235,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
             }
 
             {
-                haveNominatedPlayers &&
+                nominatePlayers &&
 
                 <div className="flex h-[500px] w-[700px]">
                         <ul>

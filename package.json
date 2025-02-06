@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "startAzure": "./node_modules/next/dist/bin/next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -13,7 +14,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
     "mssql": "^11.0.1",
-    "next": "15.1.6",
+    "next": "^15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
