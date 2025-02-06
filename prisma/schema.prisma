@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Gameweeks {
+  gameweekID    Int             @id(map: "PK_Gameweeks") @db.TinyInt
+  date          DateTime        @db.Date
+  isactive      Boolean
+  gametype      String          @db.NChar(10)
+  whitescore    Int?            @db.TinyInt
+  blackscore    Int?            @db.TinyInt
+  motm          Int?            @db.SmallInt
+  Players       Players?        @relation(fields: [motm], references: [playerID], onUpdate: NoAction, map: "FK_motm")
+  GameweekStats GameweekStats[]
+}
+
+model GameweekStats {
+  GameweekStatID                           Int       @id(map: "PK__Gameweek__9ACAB8379B3E8BF3") @default(autoincrement()) @db.SmallInt
+  gameweekID                               Int       @db.TinyInt
+  playerID                                 Int       @db.SmallInt
+  teamID                                   Boolean?
+  goals_scored                             Int?      @db.TinyInt
+  nomineeID                                Int?      @db.SmallInt
+  points                                   Int?      @db.TinyInt
+  nominated                                Boolean?  @default(false, map: "DF__GameweekS__nomin__2739D489")
+  Gameweeks                                Gameweeks @relation(fields: [gameweekID], references: [gameweekID], onUpdate: NoAction, map: "FK_GameweekStats_Gameweeks")
+  Players_GameweekStats_nomineeIDToPlayers Players?  @relation("GameweekStats_nomineeIDToPlayers", fields: [nomineeID], references: [playerID], onDelete: NoAction, onUpdate: NoAction, map: "FK_gameweekstats_nominee")
+  Players                                  Players   @relation(fields: [playerID], references: [playerID], onUpdate: NoAction, map: "FK__GameweekS__playe__6C190EBB")
+}
+
+model Players {
+  playerID                                       Int             @id(map: "PK_playerID") @db.SmallInt
+  code                                           String          @unique(map: "UQ_Players_code") @db.NChar(5)
+  firstname                                      String          @db.NVarChar(50)
+  lastname                                       String          @db.NVarChar(50)
+  totalpoints                                    Int?            @db.SmallInt
+  totalgoals                                     Int?            @db.SmallInt
+  monthpoints                                    Int?            @db.SmallInt
+  monthvotes                                     Int?            @db.SmallInt
+  Gameweeks                                      Gameweeks[]
+  GameweekStats_GameweekStats_nomineeIDToPlayers GameweekStats[] @relation("GameweekStats_nomineeIDToPlayers")
+  GameweekStats                                  GameweekStats[]
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B6100FF1AD8") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
