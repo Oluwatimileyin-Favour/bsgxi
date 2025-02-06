@@ -116,7 +116,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
     
 
     return (
-        <div className="flex justify-around w-[100%] p-10">
+        <div className="flex flex-col space-y-10 md:flex-row md:space-y-0 justify-around w-[100%] p-10">
 
             <div className="w-[300px] h-[500px] overflow-y-auto bg-gray-100 p-4 rounded-lg shadow-md">
                 <h3 className="text-center font-bold text-xl text-rose-900">Click on player to select</h3>

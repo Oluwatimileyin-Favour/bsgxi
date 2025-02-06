@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-
 const Navbar = () => {
     return (
       <nav className="bg-white shadow-md">
@@ -15,7 +14,7 @@ const Navbar = () => {
   
             {/* Navigation Links */}
             
-            <div className="hidden md:flex space-x-6">
+            <div className="space-x-6">
               <Link
                   href="/"
                   className="text-gray-700 hover:text-blue-500 font-medium"
