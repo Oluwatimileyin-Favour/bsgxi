@@ -2,9 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma"; 
 import { findMostFrequent } from "@/app/util/frequencyCalculator";
 
-export const revalidate = 1;
-export const dynamic = 'force-dynamic';
-
 export async function POST(req: Request) {
   try {
 

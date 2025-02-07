@@ -4,7 +4,6 @@ import Teamsheet from "./Teamsheet";
 import GoldenBootBoard from "./GoldenBootBoard";
 import BallondOrBoard from "./BallondOrBoard";
 
-export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
 

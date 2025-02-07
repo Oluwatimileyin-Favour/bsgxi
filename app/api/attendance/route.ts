@@ -3,9 +3,6 @@ import { Player} from "@prisma/client";
 import { GameweekStat } from "@/app/models/GameweekStat";
 import { prisma } from "@/app/lib/prisma";
 
-export const revalidate = 1;
-export const dynamic = 'force-dynamic';
-
 export async function POST(req: Request) {
   try {
     const { teamInfo } = await req.json();

@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 
-export const revalidate = 1;
-export const dynamic = 'force-dynamic';
-
 export async function POST(req: Request) {
   try {
     const { goals } = await req.json();
