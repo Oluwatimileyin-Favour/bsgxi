@@ -4,6 +4,7 @@ import GoldenBootBoard from "./GoldenBootBoard";
 import BallondOrBoard from "./BallondOrBoard";
 
 const prisma = new PrismaClient();
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
 

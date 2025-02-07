@@ -3,6 +3,9 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+export const revalidate = 1;
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   try {
     const { goals } = await req.json();

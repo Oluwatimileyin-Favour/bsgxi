@@ -64,9 +64,6 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
         if(nominator){
             const gameweekStat = [...teamBlack, ...teamWhite].find(gameweekStat => gameweekStat.playerID === nominator.playerID);
 
-            console.log(gameweekStat)
-    
-    
             const nominationPair = {gameweekStatId: gameweekStat?.GameweekStatID, nomineeId: chosenPlayer?.playerID};
 
             const body = {action: "playerSelectNominee", payload: nominationPair}; 
