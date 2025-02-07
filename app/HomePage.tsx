@@ -32,18 +32,17 @@ export default async function HomePage() {
     return (
         <>
             { gameweeks.length > 0 &&
-                <div className="flex flex-col justify-around p-10 lg:flex-row align-middle">
-                    <div className="w-[400px] md:w-[600px]">
+                <div className="flex flex-col justify-around p-5 lg:flex-row">
+                    <div className="p-6">
                         <h2 className="font-bold text-3xl text-rose-900 mb-2 text-center">Gameweek {lastGameweek}</h2>
                         <p className="text-center font-semibold">{gameweeks[lastGameweek].date.toDateString()}</p>
                         <p className="text-sm mt-3">🟡 Nominated for MOTM. Click on player to vote. Click on self to record goals scored</p>
                         <Teamsheet players={players} gameweek={gameweeks[lastGameweek]} teamBlack={teamBlack} teamWhite={teamWhite}></Teamsheet>
                     </div>   
-                    <div className="flex flex-col space-y-4 lg:space-x-4 xs:mt-10 lg:flex-row">
+                    <div className="flex flex-col items-center gap-4 xs:mt-10 lg:flex-row lg:justify-between lg:gap-4">
                         <GoldenBootBoard rankings={sortedPlayersByGoals}></GoldenBootBoard>
                         <BallondOrBoard rankings={sortedPlayersByPoints}></BallondOrBoard>
                     </div>
-
                 </div>
                 
             }

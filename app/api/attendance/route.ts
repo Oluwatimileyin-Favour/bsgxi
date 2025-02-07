@@ -3,6 +3,7 @@ import { Player, PrismaClient} from "@prisma/client";
 import { GameweekStat } from "@/app/models/GameweekStat";
 
 const prisma = new PrismaClient();
+export const revalidate = 0;
 
 export async function POST(req: Request) {
   try {

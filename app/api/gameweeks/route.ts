@@ -4,6 +4,8 @@ import { findMostFrequent } from "@/app/util/frequencyCalculator";
 
 const prisma = new PrismaClient();
 
+export const revalidate = 0;
+
 export async function POST(req: Request) {
   try {
 
@@ -14,7 +16,7 @@ export async function POST(req: Request) {
           {data: body.payload.gameweek}
       );
 
-      return NextResponse.json({ success: true, createdGameweek });
+      return NextResponse.json({ success: true, result: createdGameweek });
     }
 
     else if(body.action === "closeGameweek"){

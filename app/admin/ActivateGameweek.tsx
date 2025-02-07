@@ -56,6 +56,11 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
 
     const activateGameweek = async () => {
 
+        if(dateRef.current?.value === ""){
+            alert("Select Date");
+            return;
+        }
+
         const gameweek: Gameweek = {
             gameweekID: nextGameweek,
             date: new Date(dateRef.current?.value ?? "") ?? new Date(),
@@ -91,8 +96,13 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
     const saveteamSheets = async () => {
 
         const gameweekInfo = await activateGameweek();
+        
+        if(!gameweekInfo){
+            alert("Error saving teams");
+            return;
+        }
 
-        const teamInfo = {gameweekID: gameweekInfo.createdGameweek.gameweekID, whiteteam: teamwhite, blackteam: teamblack}
+        const teamInfo = {gameweekID: gameweekInfo.result.gameweekID, whiteteam: teamwhite, blackteam: teamblack}
 
         try {
             const response = await fetch("/api/attendance", {
@@ -116,7 +126,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
     
 
     return (
-        <div className="flex flex-col space-y-10 md:flex-row md:space-y-0 justify-around w-[100%] p-10">
+        <div className="flex flex-col gap-4 items-center md:flex-row md:justify-around w-[100%] p-10">
 
             <div className="w-[300px] h-[500px] overflow-y-auto bg-gray-100 p-4 rounded-lg shadow-md">
                 <h3 className="text-center font-bold text-xl text-rose-900">Click on player to select</h3>
@@ -150,7 +160,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                 </ul>
             </div>
 
-            <div className="flex flex-col space-y-10 w-[400px] h-[250px] self-center justify-around items-center shadow-md bg-gray-100">
+            <div className="flex flex-col w-[400px] h-[250px] self-center justify-around items-center shadow-md bg-gray-100">
 
                 <input 
                     type="date" 
@@ -158,7 +168,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                     className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500 transition" 
                 />
 
-                <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-20 w-[50%] my-auto" onClick={saveteamSheets}>
+                <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-20 w-[50%]" onClick={saveteamSheets}>
                     Activate Gameweek
                 </button>
 
