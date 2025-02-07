@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { Player, PrismaClient } from "@prisma/client";
+import { Player } from "@prisma/client";
 
-const prisma = new PrismaClient();
+import { prisma } from "@/app/lib/prisma";
 
 export const revalidate = 1;
 export const dynamic = 'force-dynamic';

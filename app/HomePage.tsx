@@ -1,9 +1,9 @@
-import {GameweekStat, PrismaClient } from "@prisma/client";
+import {GameweekStat } from "@prisma/client";
+import { prisma } from "./lib/prisma";
 import Teamsheet from "./Teamsheet";
 import GoldenBootBoard from "./GoldenBootBoard";
 import BallondOrBoard from "./BallondOrBoard";
 
-const prisma = new PrismaClient();
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {

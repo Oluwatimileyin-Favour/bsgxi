@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma"; 
 import { findMostFrequent } from "@/app/util/frequencyCalculator";
-
-const prisma = new PrismaClient();
 
 export const revalidate = 1;
 export const dynamic = 'force-dynamic';
