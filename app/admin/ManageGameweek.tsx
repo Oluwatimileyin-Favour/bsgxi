@@ -101,7 +101,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
               window.location.reload();
             } 
             else {
-              console.error("Error:", data.error);
+              alert("Error: " + data.error);
             }
         } 
         catch (error) {
@@ -132,7 +132,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
               alert("Full time score updated successfully!");  
             } 
             else {
-              console.error("Error:", data.error);
+              alert("Error: " + data.error);
             }
         } 
         catch (error) {

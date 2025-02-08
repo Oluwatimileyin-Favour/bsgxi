@@ -45,11 +45,11 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
                   window.location.reload();
                 } 
                 else {
-                  console.error("Error:", data.error);
+                    alert("Error: " + data.error);
                 }
             } 
             catch (error) {
-                console.error("Request failed:", error);
+                alert("Error: " + error);
             }
         }
         else {
@@ -88,11 +88,11 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
                   alert("Nomination saved successfully!");  
                 } 
                 else {
-                  console.error("Error:", data.error);
+                    alert("Error: " + data.error);
                 }
             } 
             catch (error) {
-                console.error("Request failed:", error);
+                alert("Error: " + error);
             }
         }
 

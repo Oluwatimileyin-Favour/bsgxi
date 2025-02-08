@@ -126,7 +126,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
               window.location.reload();
             } 
             else {
-              console.error("Error:", data.error);
+                alert("Error: " + data.error);
             }
         } 
         catch (error) {
