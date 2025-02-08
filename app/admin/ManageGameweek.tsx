@@ -14,6 +14,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
     const whiteScoreRef = useRef<HTMLInputElement>(null);
     const blackScoreRef = useRef<HTMLInputElement>(null);
     const adminCodeRef = useRef<HTMLInputElement>(null);
+    const closeGameweekRef = useRef<HTMLButtonElement>(null);
 
     const adminCode =  generateCode();
 
@@ -45,6 +46,10 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
         }
         
         e.preventDefault();
+
+        if(closeGameweekRef.current){
+            closeGameweekRef.current.style.display = 'none';  //immediately remove button so user doesn't click twice
+        }
         
         const body = {action: "closeGameweek", payload: gameweek}
         try {
@@ -56,6 +61,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
         
             const data = await response.json();
             if (data.success) {
+                window.location.reload();
                 return data
             } 
             else {
@@ -92,6 +98,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
             const data = await response.json();
             if (data.success) {
               alert("Nominees saved successfully!");  
+              window.location.reload();
             } 
             else {
               console.error("Error:", data.error);
@@ -122,7 +129,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
       
             const data = await response.json();
             if (data.success) {
-              alert("Nominees saved successfully!");  
+              alert("Full time score updated successfully!");  
             } 
             else {
               console.error("Error:", data.error);
@@ -134,14 +141,14 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
     }
 
     return (
-        <div className="flex w-[100%] justify-around p-10">
+        <div className="flex flex-col gap-4 lg:flex-row w-[100%] justify-around p-10">
 
             {
                 !closeGameweek && !nominatePlayers &&
                 <>
                     {
                         !haveNominatedPlayers &&
-                        <div className="w-[500px] h-[500px] overflow-y-auto bg-gray-100 p-4 rounded-lg shadow-md">
+                        <div className="h-[500px] overflow-y-auto bg-gray-100 p-4 rounded-lg shadow-md">
                             <h3 className="text-center font-bold text-xl text-rose-900">Click on player to nominate for MOTM</h3>
                             <ul className="space-y-2">
                                 {gameweekPlayers.map( (player) => (
@@ -154,7 +161,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                     }
                     
 
-                    <div className="flex flex-col h-[500px]">
+                    <div className="flex flex-col justify-between items-center">
                         <ul>
                             <h3 className="text-center font-bold text-xl text-rose-900">Nominees</h3>
                             {nominees.map( (player) => (
@@ -164,13 +171,12 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                             ))}
                         </ul>
                             { !haveNominatedPlayers &&
-                                <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-10 w-50 my-auto"
+                                <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-10 w-[100px]"
                                     onClick={() => updateNominatePlayersStatus(true)}
                                 >
                                     Confirm
                                 </button>
-                            }
-                       
+                            }   
                     </div>
 
                     <div className="flex flex-col items-center">
@@ -237,7 +243,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
             {
                 nominatePlayers &&
 
-                <div className="flex h-[500px] w-[700px]">
+                <div className="flex flex-col gap-4 lg:flex-row h-[500px] w-[700px]">
                         <ul>
                             <h3 className="text-center font-bold text-xl text-rose-900">Nominees</h3>
                             {nominees.map( (player) => (
@@ -311,6 +317,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                     <button
                         type="submit"
                         className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ref={closeGameweekRef}
                     >
                         I&apos;m sure
                     </button>

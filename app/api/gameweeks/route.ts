@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     if(body.action === "activateGameweek"){
       const createdGameweek = await prisma.gameweek.create(
-          {data: body.payload.gameweek}
+          {data: body.payload}
       );
 
       return NextResponse.json({ success: true, result: createdGameweek });
@@ -21,62 +21,64 @@ export async function POST(req: Request) {
         gameweekID: body.payload.gameweekID
       }})
 
-      let nominees = gameweekStats.map(gameweekStat => gameweekStat.nomineeID);
-      nominees = nominees.filter(nominee => nominee != null)
+      const nominatedPlayers: number[] = gameweekStats.map(gameweekStat => gameweekStat.nomineeID).filter(nominee => nominee != null);
+    
+      let motm: number = nominatedPlayers[0] ?? -1;  //set motm (man of the match) to -1 if no one was nominated at all
 
-      const goalsTransactions = gameweekStats.map((gameweekStat) =>
-        prisma.player.update({
-          where: { playerID: gameweekStat.playerID },
-          data: { totalgoals: {increment: gameweekStat.goals_scored ?? 0} },
-        })
-      );
+      if(nominatedPlayers.length > 1){
+        motm = findMostFrequent(nominatedPlayers) ?? -1;
 
-      await prisma.$transaction(goalsTransactions);
+        const potentialOtherMotm = findMostFrequent(nominatedPlayers.filter(nominee => nominee != motm)) ?? -1;
 
-      const pointsTransactions = gameweekStats.map((gameweekStat) =>
-        prisma.player.update({
-          where: { playerID: gameweekStat.playerID },
-          data: { totalpoints: {increment: gameweekStat.points ?? 0} },
-        })
-      );
+        const motmNumVotes = nominatedPlayers.filter(nominee => nominee === motm).length
+        const potentialOtherMotmNumVotes = nominatedPlayers.filter(nominee => nominee === potentialOtherMotm ).length
 
-      await prisma.$transaction(pointsTransactions);
-      
-      const motm = findMostFrequent(nominees);
+        if(motmNumVotes === potentialOtherMotmNumVotes){
+          throw("Multiple MOTMs");
+        }
+      }
 
-      if(motm){
-          await prisma.gameweek.update({
-            where: { gameweekID: body.payload.gameweekID },
-            data: {motm: motm}
-          })
-
-          const nomineeSet = [...new Set(nominees)]
-          
-          nomineeSet.map(async (nominee) => {
-            const gameweekStatId = gameweekStats.find(gameweekStat => gameweekStat.playerID == nominee)
-            if(nominee != motm){
-              await prisma.gameweekStat.update({
-                where: { GameweekStatID: gameweekStatId?.GameweekStatID },
-                data: { points: 1 },
-              })
-            }
-            else{
-              await prisma.gameweekStat.update({
-                where: { GameweekStatID: gameweekStatId?.GameweekStatID },
-                data: { points: 3 },
-              })
-            }
-        });
+      if(motm != -1){
 
         await prisma.gameweek.update({
           where: { gameweekID: body.payload.gameweekID },
-          data: {isactive: false}
+          data: {
+            motm: motm,
+            isactive: false
+          }
         })
+              
+        gameweekStats.forEach(async gameweekStat => {  //assign motm 4 points
+          if(gameweekStat.playerID === motm){
+            gameweekStat.points = 4;
+
+            await prisma.gameweekStat.update({
+              where: { GameweekStatID: gameweekStat?.GameweekStatID},
+              data: { points: 4 },
+            })
+          }
+        })
+     
+        //add every player that played goals and points to total
+       const transactions = gameweekStats.map((gameweekStat) =>
+          prisma.player.update({
+            where: { playerID: gameweekStat.playerID },
+            data: { totalgoals: {increment: gameweekStat.goals_scored ?? 0},
+                    totalpoints: {increment: gameweekStat.points ?? 0}
+                  },
+          })
+        );
+
+        await prisma.$transaction(transactions);
       }
+      else{
+        throw("Error occured in motm calculation")
+      }
+      
       return NextResponse.json({ success: true});
     }
     
   } catch (error) {
-    return NextResponse.json({ success: false, error: error }, { status: 500 });
+    return NextResponse.json({ success: false, error: error}, { status: 500 });
   }
 }

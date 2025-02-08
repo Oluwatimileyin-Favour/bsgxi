@@ -7,13 +7,14 @@ export async function POST(req: Request) {
     const { body } = await req.json();
 
     if(body.action === "adminSelectNominees"){
-      const playerids = body.nominees.map((nominee: Player) => nominee.playerID);
+      const playerIds = body.payload.map((nominee: Player) => nominee.playerID);
       const updatedRecords = await prisma.gameweekStat.updateMany({
         where: {
-          playerID: { in: playerids } 
+          playerID: { in: playerIds } 
         },
         data: {
-          nominated: true 
+          nominated: true,
+          points: 2
         }
     });
     

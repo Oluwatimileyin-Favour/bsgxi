@@ -8,12 +8,12 @@ export async function POST(req: Request) {
     const { teamInfo } = await req.json();
 
     const whiteplayers = teamInfo.whiteteam.map((player: Player) => {
-        const gameweekStat: GameweekStat = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, teamID: true, goals_scored: 0, points: 0, nominated: false}
+        const gameweekStat: GameweekStat = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, teamID: true, goals_scored: 0, points: 1, nominated: false}
         return gameweekStat;
     })
 
     const blackplayers = teamInfo.blackteam.map((player: Player) => {
-        const gameweekStat: GameweekStat = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, teamID: false, goals_scored: 0, points: 0, nominated: false}
+        const gameweekStat: GameweekStat = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, teamID: false, goals_scored: 0, points: 1, nominated: false}
         return gameweekStat;
     })
     

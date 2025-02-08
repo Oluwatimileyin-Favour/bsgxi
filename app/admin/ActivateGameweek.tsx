@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from "react";
+import generateCode from "../util/generateCode";
 import { Player, Gameweek } from "@prisma/client";
 
 export default function ActivateGameweek({playerList, nextGameweek }: { playerList: Player[] , nextGameweek: number}) {
@@ -11,7 +12,10 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
     const [whiteTurn, updateTurn] = useState<boolean>(true);
     
     const dateRef = useRef<HTMLInputElement | null>(null);
+    const adminCodeRef = useRef<HTMLInputElement>(null);
 
+    const adminCode =  generateCode();
+    
     const onclickplayer = (chosenPlayer: Player) => {
         const updatePlayers = players.filter(player => player.playerID != chosenPlayer.playerID);
         const updateblack = [...teamblack, chosenPlayer];
@@ -95,6 +99,11 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
 
     const saveteamSheets = async () => {
 
+        if(adminCodeRef.current?.value != adminCode){
+            alert("Incorrect Code");
+            return;
+        }
+
         const gameweekInfo = await activateGameweek();
         
         if(!gameweekInfo){
@@ -113,7 +122,8 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
       
             const data = await response.json();
             if (data.success) {
-              alert("Teams saved successfully!");  
+              alert("Teams saved successfully. Gameweek Activated"); 
+              window.location.reload();
             } 
             else {
               console.error("Error:", data.error);
@@ -167,6 +177,15 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                     ref={dateRef}
                     className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500 transition" 
                 />
+
+                <input
+                    type="text"
+                    id="textInput"
+                    ref={adminCodeRef}
+                    name="textInput"
+                    placeholder="admin code"
+                    className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500"
+                />  
 
                 <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-20 w-[50%]" onClick={saveteamSheets}>
                     Activate Gameweek

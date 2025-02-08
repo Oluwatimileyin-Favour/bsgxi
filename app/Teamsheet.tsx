@@ -16,6 +16,8 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
     
     const chosenPlayer = players.find(player => player.playerID === chosenPlayerStats.playerID)
 
+    const motm: number = gameweek.motm ?? -1;
+
     const handleClick = (stats: GameweekStat) => {
         if(gameweek.isactive){
             updateChosenPlayerStats(stats)
@@ -28,7 +30,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
 
     const updateGoals = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        if(players.find(player => player.code === playerCodeRef.current?.value)){
+        if(chosenPlayer?.code.trim() === playerCodeRef.current?.value.trim()){
             const goals = {gameweekStatId: chosenPlayerStats.GameweekStatID, goalsScored: goalsScoredRef.current?.value};
             try {
                 const response = await fetch("/api/goals", {
@@ -40,6 +42,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
                 const data = await response.json();
                 if (data.success) {
                   alert("Goals updated successfully!");  
+                  window.location.reload();
                 } 
                 else {
                   console.error("Error:", data.error);
@@ -59,10 +62,15 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
     const handleNomination = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
-        const nominator = players.find(player => player.code === playerCodeRef.current?.value);
+        const nominator = players.find(player => player.code.trim() === playerCodeRef.current?.value.trim());
 
         if(nominator){
             const gameweekStat = [...teamBlack, ...teamWhite].find(gameweekStat => gameweekStat.playerID === nominator.playerID);
+
+            if(!gameweekStat){
+                alert("Player with entered code cannot vote");
+                return;
+            }
 
             const nominationPair = {gameweekStatId: gameweekStat?.GameweekStatID, nomineeId: chosenPlayer?.playerID};
 
@@ -113,7 +121,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
                                 <li key={teamBlackPlayer.playerID} className={clsx("p-[10px] rounded-lg hover:bg-gray-200 cursor-pointer text-center", teamBlackPlayer.nominated ? "font-semibold text-yellow-500" : "")}
                                     onClick={() => handleClick(teamBlackPlayer)}
                                 >
-                                    {players.find(player => player.playerID === teamBlackPlayer.playerID)?.firstname} - {teamBlackPlayer.goals_scored} ⚽
+                                   {(teamBlackPlayer.playerID === motm) && <span>👑</span>} {players.find(player => player.playerID === teamBlackPlayer.playerID)?.firstname} - {teamBlackPlayer.goals_scored} ⚽
                                 </li>
                             ))}
                         </ul>
@@ -125,7 +133,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
                                     <li key={teamWhitePlayer.playerID} className={clsx("p-[10px] rounded-lg hover:bg-gray-200 cursor-pointer text-center", teamWhitePlayer.nominated ? "font-semibold text-yellow-500" : "")}
                                         onClick={() => handleClick(teamWhitePlayer)}
                                     >
-                                        {players.find(player => player.playerID === teamWhitePlayer.playerID)?.firstname} - {teamWhitePlayer.goals_scored} ⚽
+                                        {(teamWhitePlayer.playerID === motm) && <span>👑</span>} {players.find(player => player.playerID === teamWhitePlayer.playerID)?.firstname} - {teamWhitePlayer.goals_scored} ⚽
                                     </li>
                                 ))}
                             </ul>
