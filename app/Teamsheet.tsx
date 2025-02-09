@@ -13,6 +13,8 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
 
     const goalsScoredRef = useRef<HTMLInputElement>(null);
     const playerCodeRef = useRef<HTMLInputElement>(null);
+    const updateGoalsRef = useRef<HTMLButtonElement>(null);
+    const handleNominationRef = useRef<HTMLButtonElement>(null);
     
     const chosenPlayer = players.find(player => player.playerID === chosenPlayerStats.playerID)
 
@@ -30,6 +32,11 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
 
     const updateGoals = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
+
+        if(updateGoalsRef.current){
+            updateGoalsRef.current.style.display = 'none';  //immediately remove button so user doesn't click twice
+        }
+
         if(chosenPlayer?.code.trim() === playerCodeRef.current?.value.trim()){
             const goals = {gameweekStatId: chosenPlayerStats.GameweekStatID, goalsScored: goalsScoredRef.current?.value};
             try {
@@ -61,6 +68,10 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
 
     const handleNomination = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
+
+        if(handleNominationRef.current){
+            handleNominationRef.current.style.display = 'none';  //immediately remove button so user doesn't click twice
+        }
 
         const nominator = players.find(player => player.code.trim() === playerCodeRef.current?.value.trim());
 
@@ -205,6 +216,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
                     <button
                         type="submit"
                         className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ref={updateGoalsRef}
                     >
                         Save
                     </button>
@@ -241,6 +253,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
                     <button
                         type="submit"
                         className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ref={handleNominationRef}
                     >
                         Save
                     </button>
