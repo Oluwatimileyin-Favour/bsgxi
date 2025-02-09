@@ -243,7 +243,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
             {
                 nominatePlayers &&
 
-                <div className="flex flex-col gap-4 lg:flex-row h-[500px] w-[700px]">
+                <div className="flex flex-col gap-4 lg:flex-row h-[500px]">
                         <ul>
                             <h3 className="text-center font-bold text-xl text-rose-900">Nominees</h3>
                             {nominees.map( (player) => (

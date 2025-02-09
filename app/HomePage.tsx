@@ -34,7 +34,7 @@ export default async function HomePage() {
                 {
                     (gameweeks.length === 0 &&
                         <div className="flex h-[400px] w-[400px] justify-center items-center p-10">
-                            <h2 className="font-bold text-4xl text-rose-900 mb-2 text-center">Season has not begun</h2>
+                            <h2 className="font-bold text-4xl text-rose-900 mb-2 text-center">Season has not begun ⏳</h2>
                         </div>
                     )
                     || 

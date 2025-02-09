@@ -13,7 +13,7 @@ export default {
         foreground: "var(--foreground)",
       },
       screens: {
-        'xs': '400px', // Custom breakpoint for extra small screens
+        'xs': '350px', // Custom breakpoint for extra small screens
       },
     },
   },
