@@ -149,7 +149,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                 </ul>
             </div>
         
-            <div className="flex justify-between w-[400px] h-[500px] rounded-lg shadow-md bg-gray-100 p-4">
+            <div className="flex justify-between w-[300px] h-[500px] rounded-lg shadow-md bg-gray-100 p-4">
                 
                 <ul>
                     <h3 className="text-center font-bold text-xl text-rose-900">Team White</h3>
@@ -170,11 +170,12 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                 </ul>
             </div>
 
-            <div className="flex flex-col w-[400px] h-[250px] self-center justify-around items-center shadow-md bg-gray-100">
+            <div className="flex flex-col w-[300px] h-[250px] self-center justify-around items-center shadow-md bg-gray-100">
 
                 <input 
                     type="date" 
                     ref={dateRef}
+                    placeholder="date"
                     className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500 transition" 
                 />
 
