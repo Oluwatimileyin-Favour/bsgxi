@@ -12,8 +12,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     permissions:
       contents: read #This is required for actions/checkout
 
@@ -32,7 +30,7 @@ jobs:
           npm run test --if-present
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* .next -qr
+        run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -62,9 +60,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_DFDAE207019C41D9915A90BA53032466 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A19D98F90678410C8D4F72040BFF62AF }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F4F2EE6DA4134F62BF19E0FF0267FE29 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_17E43BAD40E04CF6A1668382144D943F }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9E6282081B4C4ED3A080BA5E71FF2E79 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E7F9289903B84035A308694A93B548F8 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
