@@ -8,7 +8,7 @@ export default function AboutPage(){
         style={{ backgroundImage: "url('brown.jpg')" }}
         >
             <div className="flex flex-col gap-3 text-xl font-semibold text-white p-3">
-                <p>BSG-XI is a modern web application created specially for BSG FC to keep track of various player statistics</p>
+                <p>BSG-XI was created specially for BSG FC to keep track of various player statistics</p>
                 <p>Created by Oluwatimileyin Favour Obagbuwa with Next.js</p>
                 <p>Special thanks to BSG FC Admin: Nawaaz, Divashin and Kuda</p>
                 <p className="font-normal">There might be 🐞🐛. Let me know if you run into any</p>
