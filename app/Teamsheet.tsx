@@ -2,11 +2,11 @@
 
 import { useState, useRef } from "react";
 import clsx from "clsx";
-import { Gameweek, GameweekStat, Player } from "@prisma/client";
+import { Gameweek, Gameweekstat, Player } from "@prisma/client";
 
-export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {players: Player[], gameweek: Gameweek, teamBlack: GameweekStat[], teamWhite: GameweekStat[]}){
+export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {players: Player[], gameweek: Gameweek, teamBlack: Gameweekstat[], teamWhite: Gameweekstat[]}){
 
-    const [chosenPlayerStats, updateChosenPlayerStats] = useState<GameweekStat>(teamBlack[0]);
+    const [chosenPlayerStats, updateChosenPlayerStats] = useState<Gameweekstat>(teamBlack[0]);
     const [isPlayerSelected, updateSelectionStatus] = useState<boolean>(false);
     const [nominateForMotm, updateNominateForMotmStatus] = useState<boolean>(false);
     const [enterGoals, updateEnterGoalsStatus] = useState<boolean>(false);
@@ -20,7 +20,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
 
     const motm: number = gameweek.motm ?? -1;
 
-    const handleClick = (stats: GameweekStat) => {
+    const handleClick = (stats: Gameweekstat) => {
         if(gameweek.isactive){
             updateChosenPlayerStats(stats)
             updateSelectionStatus(!isPlayerSelected)
@@ -38,7 +38,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
         }
 
         if(chosenPlayer?.code.trim() === playerCodeRef.current?.value.trim()){
-            const goals = {gameweekStatId: chosenPlayerStats.GameweekStatID, goalsScored: goalsScoredRef.current?.value};
+            const goals = {gameweekStatId: chosenPlayerStats.gameweekStatID, goalsScored: goalsScoredRef.current?.value};
             try {
                 const response = await fetch("/api/goals", {
                   method: "POST",
@@ -76,14 +76,14 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
         const nominator = players.find(player => player.code.trim() === playerCodeRef.current?.value.trim());
 
         if(nominator){
-            const gameweekStat = [...teamBlack, ...teamWhite].find(gameweekStat => gameweekStat.playerID === nominator.playerID);
+            const gameweekstat = [...teamBlack, ...teamWhite].find(gameweekstat => gameweekstat.playerID === nominator.playerID);
 
-            if(!gameweekStat){
+            if(!gameweekstat){
                 alert("Player with entered code cannot vote");
                 return;
             }
 
-            const nominationPair = {gameweekStatId: gameweekStat?.GameweekStatID, nomineeId: chosenPlayer?.playerID};
+            const nominationPair = {gameweekStatId: gameweekstat?.gameweekStatID, nomineeId: chosenPlayer?.playerID};
 
             const body = {action: "playerSelectNominee", payload: nominationPair}; 
             

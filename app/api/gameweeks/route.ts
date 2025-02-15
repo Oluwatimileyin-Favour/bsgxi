@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     else if(body.action === "closeGameweek"){
 
-      const gameweekStats = await prisma.gameweekStat.findMany({where: {
+      const gameweekStats = await prisma.gameweekstat.findMany({where: {
         gameweekID: body.payload.gameweekID
       }})
 
@@ -52,8 +52,8 @@ export async function POST(req: Request) {
           if(gameweekStat.playerID === motm){
             gameweekStat.points = 4;
 
-            await prisma.gameweekStat.update({
-              where: { GameweekStatID: gameweekStat?.GameweekStatID},
+            await prisma.gameweekstat.update({
+              where: { gameweekStatID: gameweekStat?.gameweekStatID},
               data: { points: 4 },
             })
           }

@@ -20,7 +20,7 @@ export default async function page(){
         lastGameweek = gameweeks.length - 1;
         lastGameweekIsActive = gameweeks[lastGameweek].isactive;
 
-        const gameweekStats = await prisma.gameweekStat.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
+        const gameweekStats = await prisma.gameweekstat.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
         const gameweekPlayersIds = gameweekStats.map(gameweekStat => gameweekStat.playerID);
     
         gameweekPlayers = allplayers.filter(player => gameweekPlayersIds.includes(player.playerID));

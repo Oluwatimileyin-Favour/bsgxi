@@ -1,65 +1,57 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
-  provider = "sqlserver"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model Gameweek {
-  gameweekID    Int             @id(map: "PK_Gameweeks") @db.TinyInt
-  date          DateTime        @db.Date
+  gameweekID    Int            @id @db.TinyInt
+  date          DateTime       @db.Date
   isactive      Boolean
-  gametype      String          @db.NChar(10)
-  whitescore    Int?            @db.TinyInt
-  blackscore    Int?            @db.TinyInt
-  motm          Int?            @db.SmallInt
-  Players       Player?        @relation(fields: [motm], references: [playerID], onUpdate: NoAction, map: "FK_motm")
-  GameweekStats GameweekStat[]
+  gametype      String         @db.VarChar(20)
+  whitescore    Int?           @db.TinyInt
+  blackscore    Int?           @db.TinyInt
+  motm          Int?           @db.TinyInt
+  players       Player?        @relation(fields: [motm], references: [playerID], onDelete: NoAction, map: "fk_gameweeks_players_motm")
+  gameweekstats Gameweekstat[]
 
+  @@index([motm], map: "fk_gameweeks_players_motm_idx")
   @@map("gameweeks")
 }
 
-model GameweekStat {
-  GameweekStatID                           Int       @id(map: "PK__Gameweek__9ACAB8379B3E8BF3") @default(autoincrement()) @db.SmallInt
-  gameweekID                               Int       @db.TinyInt
-  playerID                                 Int       @db.SmallInt
-  teamID                                   Boolean?
-  goals_scored                             Int?      @db.TinyInt
-  nomineeID                                Int?      @db.SmallInt
-  points                                   Int?      @db.TinyInt
-  nominated                                Boolean?  @default(false, map: "DF__GameweekS__nomin__2739D489")
-  Gameweeks                                Gameweek @relation(fields: [gameweekID], references: [gameweekID], onUpdate: NoAction, map: "FK_GameweekStats_Gameweeks")
-  Players_GameweekStats_nomineeIDToPlayers Player?  @relation("GameweekStats_nomineeIDToPlayers", fields: [nomineeID], references: [playerID], onDelete: NoAction, onUpdate: NoAction, map: "FK_gameweekstats_nominee")
-  Players                                  Player   @relation(fields: [playerID], references: [playerID], onUpdate: NoAction, map: "FK__GameweekS__playe__6C190EBB")
+model Gameweekstat {
+  gameweekStatID                           Int      @id @default(autoincrement()) @db.SmallInt
+  gameweekID                               Int      @db.TinyInt
+  playerID                                 Int      @db.TinyInt
+  team                                     Boolean?
+  goals_scored                             Int?     @db.TinyInt
+  nomineeID                                Int?     @db.TinyInt
+  points                                   Int?     @db.TinyInt
+  nominated                                Boolean?
+  gameweeks                                Gameweek @relation(fields: [gameweekID], references: [gameweekID], onDelete: NoAction, onUpdate: NoAction, map: "fk_gameweekstats_gameweeks_gameweekID")
+  players_gameweekstats_playerIDToplayers  Player   @relation("gameweekstats_playerIDToplayers", fields: [playerID], references: [playerID], onDelete: NoAction, map: "fk_gameweekstats_players")
+  players_gameweekstats_nomineeIDToplayers Player?  @relation("gameweekstats_nomineeIDToplayers", fields: [nomineeID], references: [playerID], onDelete: NoAction, map: "fk_gameweekstats_players_nomineeID")
 
-  @@map("gameweekStats")
+  @@index([gameweekID], map: "fk_gameweekstats_gameweeks_gameweekID_idx")
+  @@index([playerID], map: "fk_gameweekstats_players_idx")
+  @@index([nomineeID], map: "fk_gameweekstats_players_nomineeID_idx")
+  @@map("gameweekstats")
 }
 
 model Player {
-  playerID                                       Int             @id(map: "PK_playerID") @db.SmallInt
-  code                                           String          @unique(map: "UQ_Players_code") @db.NChar(5)
-  firstname                                      String          @db.NVarChar(50)
-  lastname                                       String          @db.NVarChar(50)
-  totalpoints                                    Int?            @db.SmallInt
-  totalgoals                                     Int?            @db.SmallInt
-  monthpoints                                    Int?            @db.SmallInt
-  monthvotes                                     Int?            @db.SmallInt
-  Gameweeks                                      Gameweek[]
-  GameweekStats_GameweekStats_nomineeIDToPlayers GameweekStat[] @relation("GameweekStats_nomineeIDToPlayers")
-  GameweekStats                                  GameweekStat[]
+  playerID                                       Int            @id @db.TinyInt
+  code                                           String         @unique(map: "code_UNIQUE") @db.Char(5)
+  firstname                                      String         @db.VarChar(45)
+  lastname                                       String         @db.VarChar(45)
+  totalpoints                                    Int?           @db.TinyInt
+  totalgoals                                     Int?           @db.TinyInt
+  gameweeks                                      Gameweek[]
+  gameweekstats_gameweekstats_playerIDToplayers  Gameweekstat[] @relation("gameweekstats_playerIDToplayers")
+  gameweekstats_gameweekstats_nomineeIDToplayers Gameweekstat[] @relation("gameweekstats_nomineeIDToplayers")
 
   @@map("players")
-}
-
-model sysdiagrams {
-  name         String @db.NVarChar(128)
-  principal_id Int
-  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B6100FF1AD8") @default(autoincrement())
-  version      Int?
-  definition   Bytes?
-
-  @@unique([principal_id, name], map: "UK_principal_name")
 }

@@ -8,16 +8,16 @@ export async function POST(req: Request) {
     const { teamInfo } = await req.json();
 
     const whiteplayers = teamInfo.whiteteam.map((player: Player) => {
-        const gameweekStat: GameweekStat = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, teamID: true, goals_scored: 0, points: 1, nominated: false}
+        const gameweekStat: GameweekStat = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, team: true, goals_scored: 0, points: 1, nominated: false}
         return gameweekStat;
     })
 
     const blackplayers = teamInfo.blackteam.map((player: Player) => {
-        const gameweekStat: GameweekStat = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, teamID: false, goals_scored: 0, points: 1, nominated: false}
+        const gameweekStat: GameweekStat = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, team: false, goals_scored: 0, points: 1, nominated: false}
         return gameweekStat;
     })
     
-    const gameweekStats = await prisma.gameweekStat.createMany({data: whiteplayers.concat(blackplayers)});
+    const gameweekStats = await prisma.gameweekstat.createMany({data: whiteplayers.concat(blackplayers)});
     
     return NextResponse.json({ success: true, result: gameweekStats});
   } 

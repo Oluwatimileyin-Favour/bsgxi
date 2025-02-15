@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
     if(body.action === "adminSelectNominees"){
       const playerIds = body.payload.map((nominee: Player) => nominee.playerID);
-      const updatedRecords = await prisma.gameweekStat.updateMany({
+      const updatedRecords = await prisma.gameweekstat.updateMany({
         where: {
           playerID: { in: playerIds } 
         },
@@ -24,9 +24,9 @@ export async function POST(req: Request) {
     else if(body.action === "playerSelectNominee"){
       
 
-      const updatedMotmNomination = await prisma.gameweekStat.update({
+      const updatedMotmNomination = await prisma.gameweekstat.update({
         where: {
-          GameweekStatID: body.payload.gameweekStatId
+          gameweekStatID: body.payload.gameweekStatId
         },
         data: {
           nomineeID: body.payload.nomineeId

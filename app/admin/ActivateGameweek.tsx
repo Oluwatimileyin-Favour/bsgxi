@@ -149,7 +149,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                 </ul>
             </div>
         
-            <div className="flex justify-between w-[300px] h-[500px] rounded-lg shadow-md bg-gray-100 p-4">
+            <div className="flex justify-between w-[300px] md:w-[400px] h-[500px] rounded-lg shadow-md bg-gray-100 p-4">
                 
                 <ul>
                     <h3 className="text-center font-bold text-xl text-rose-900">Team White</h3>

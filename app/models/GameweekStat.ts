@@ -1,7 +1,7 @@
 export interface GameweekStat {
   gameweekID: number,
   playerID: number,
-  teamID: boolean,
+  team: boolean,
   goals_scored: number,
   points: number,
   nominated: boolean

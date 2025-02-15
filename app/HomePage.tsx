@@ -1,4 +1,4 @@
-import {GameweekStat } from "@prisma/client";
+import {Gameweekstat } from "@prisma/client";
 import { prisma } from "./lib/prisma";
 import Teamsheet from "./Teamsheet";
 import GoldenBootBoard from "./GoldenBootBoard";
@@ -11,18 +11,18 @@ export default async function HomePage() {
     const gameweeks = await prisma.gameweek.findMany();
 
     const lastGameweek = gameweeks.length - 1;
-    let teamBlack: GameweekStat[] = []
-    let teamWhite: GameweekStat[] = []
+    let teamBlack: Gameweekstat[] = []
+    let teamWhite: Gameweekstat[] = []
 
     if(lastGameweek >= 0){
-        const gameweekStats = await prisma.gameweekStat.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
+        const gameweekStats = await prisma.gameweekstat.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
  
         teamBlack = gameweekStats.filter(stat => {
-            return stat.teamID === false
+            return stat.team === false
         })
         
         teamWhite = gameweekStats.filter(stat => {
-            return stat.teamID === true
+            return stat.team === true
         })
     }
 
