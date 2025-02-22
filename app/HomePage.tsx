@@ -10,12 +10,12 @@ export default async function HomePage() {
     const players = await prisma.player.findMany();
     const gameweeks = await prisma.gameweek.findMany();
 
-    const lastGameweek = gameweeks.length - 1;
+    const lastGameweekIdx = gameweeks.length - 1;
     let teamBlack: Gameweekstat[] = []
     let teamWhite: Gameweekstat[] = []
 
-    if(lastGameweek >= 0){
-        const gameweekStats = await prisma.gameweekstat.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
+    if(lastGameweekIdx >= 0){
+        const gameweekStats = await prisma.gameweekstat.findMany({ where: { gameweekID: gameweeks[lastGameweekIdx].gameweekID } })
  
         teamBlack = gameweekStats.filter(stat => {
             return stat.team === false
@@ -30,7 +30,7 @@ export default async function HomePage() {
     const sortedPlayersByPoints = [...players].sort((a, b) => (b.totalpoints || 0) - (a.totalpoints || 0));
 
     return (
-            <div className="flex flex-col justify-around p-5 lg:flex-row">
+            <div className="flex flex-col justify-around items-center p-5 lg:flex-row">
                 {
                     (gameweeks.length === 0 &&
                         <div className="flex h-[400px] justify-center items-center p-10">
@@ -39,12 +39,12 @@ export default async function HomePage() {
                     )
                     || 
                     (
-                        <div className="p-3">
-                            <h2 className="font-bold text-3xl text-rose-900 mb-2 text-center">Gameweek {lastGameweek + 1}</h2>
-                            <p className="text-center font-semibold">{gameweeks[lastGameweek].date.toDateString()}</p>
-                            <p className="text-sm mt-3 text-center">👑 MOTM. 🟡 Nominated for MOTM</p>
+                        <div className="p-3 md:w-[500px]">
+                            <h2 className="font-bold text-3xl text-rose-900 mb-2 text-center">Gameweek {lastGameweekIdx + 1}</h2>
+                            <p className="text-center font-semibold">{gameweeks[lastGameweekIdx].date.toDateString()}</p>
+                            <p className="text-sm mt-3 text-center">👑 MOTM. 🦾 Shortlisted for MOTM</p>
                             <p className="text-sm mt-3 text-center">Click on player to vote. Click on self to record goals scored</p>
-                            <Teamsheet players={players} gameweek={gameweeks[lastGameweek]} teamBlack={teamBlack} teamWhite={teamWhite}></Teamsheet>
+                            <Teamsheet players={players} gameweek={gameweeks[lastGameweekIdx]} teamBlack={teamBlack} teamWhite={teamWhite}></Teamsheet>
                         </div>  
                     )
                 }

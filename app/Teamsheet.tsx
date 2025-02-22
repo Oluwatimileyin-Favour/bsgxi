@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef } from "react";
-import clsx from "clsx";
 import { Gameweek, Gameweekstat, Player } from "@prisma/client";
 
 export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {players: Player[], gameweek: Gameweek, teamBlack: Gameweekstat[], teamWhite: Gameweekstat[]}){
@@ -13,6 +12,7 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
 
     const goalsScoredRef = useRef<HTMLInputElement>(null);
     const playerCodeRef = useRef<HTMLInputElement>(null);
+    
     const updateGoalsRef = useRef<HTMLButtonElement>(null);
     const handleNominationRef = useRef<HTMLButtonElement>(null);
     
@@ -126,25 +126,25 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
                 !isPlayerSelected && 
                 <>
                     <div>
-                        <h3 className="text-center font-bold text-xl text-rose-900">Team Black ({gameweek.blackscore} ⚽)</h3>
-                        <ul>
+                        <h3 className="font-bold text-xl text-rose-900">Team Black ({gameweek.blackscore} ⚽)</h3>
+                        <ul className="flex flex-col gap-4 mt-2">
                             {teamBlack.map((teamBlackPlayer) => (
-                                <li key={teamBlackPlayer.playerID} className={clsx("p-[10px] rounded-lg hover:bg-gray-200 cursor-pointer text-center", teamBlackPlayer.nominated ? "font-semibold text-yellow-500" : "")}
+                                <li key={teamBlackPlayer.playerID} className="rounded-lg hover:bg-gray-200 cursor-pointer font-medium"
                                     onClick={() => handleClick(teamBlackPlayer)}
                                 >
-                                   {(teamBlackPlayer.playerID === motm) && <span>👑</span>} {players.find(player => player.playerID === teamBlackPlayer.playerID)?.firstname} - {teamBlackPlayer.goals_scored} ⚽
+                                   {(teamBlackPlayer.playerID === motm) && <span>👑</span>} {(teamBlackPlayer.playerID != motm && teamBlackPlayer.nominated) && <span>🦾</span>} {players.find(player => player.playerID === teamBlackPlayer.playerID)?.firstname} { (teamBlackPlayer.goals_scored ?? 0) > 0 && <span>- {teamBlackPlayer.goals_scored} ⚽</span>} 
                                 </li>
                             ))}
                         </ul>
                     </div>
                     <div>
-                            <h3 className="text-center font-bold text-xl text-rose-900">Team White ({gameweek.whitescore} ⚽)</h3>
-                            <ul>
+                            <h3 className="font-bold text-xl text-rose-900">Team White ({gameweek.whitescore} ⚽)</h3>
+                            <ul className="flex flex-col gap-4 mt-2">
                                 {teamWhite.map((teamWhitePlayer) => (
-                                    <li key={teamWhitePlayer.playerID} className={clsx("p-[10px] rounded-lg hover:bg-gray-200 cursor-pointer text-center", teamWhitePlayer.nominated ? "font-semibold text-yellow-500" : "")}
+                                    <li key={teamWhitePlayer.playerID} className="rounded-lg hover:bg-gray-200 cursor-pointer font-medium"
                                         onClick={() => handleClick(teamWhitePlayer)}
                                     >
-                                        {(teamWhitePlayer.playerID === motm) && <span>👑</span>} {players.find(player => player.playerID === teamWhitePlayer.playerID)?.firstname} - {teamWhitePlayer.goals_scored} ⚽
+                                         {(teamWhitePlayer.playerID === motm) && <span>👑</span>} {(teamWhitePlayer.playerID != motm && teamWhitePlayer.nominated) && <span>🦾</span>} {players.find(player => player.playerID === teamWhitePlayer.playerID)?.firstname} { (teamWhitePlayer.goals_scored ?? 0) > 0 && <span>- {teamWhitePlayer.goals_scored} ⚽</span>}
                                     </li>
                                 ))}
                             </ul>
