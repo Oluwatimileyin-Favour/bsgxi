@@ -39,7 +39,7 @@ export default async function HomePage() {
                     )
                     || 
                     (
-                        <div className="p-3 md:w-[500px]">
+                        <div className="p-3 md:w-[500px] max-sm:w-[300px]">
                             <h2 className="font-bold text-3xl text-rose-900 mb-2 text-center">Gameweek {lastGameweekIdx + 1}</h2>
                             <p className="text-center font-semibold">{gameweeks[lastGameweekIdx].date.toDateString()}</p>
                             <p className="text-sm mt-3 text-center">👑 MOTM. 🦾 Shortlisted for MOTM</p>
