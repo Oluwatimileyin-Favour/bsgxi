@@ -87,7 +87,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
 
         e.preventDefault();
         
-        const body = {action: "adminSelectNominees", payload: nominees};
+        const body = {action: "adminSelectNominees", payload: {nominees:nominees, gameweek: gameweek}};
         try {
             const response = await fetch("/api/nomination", {
               method: "POST",

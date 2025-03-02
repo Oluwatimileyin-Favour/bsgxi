@@ -1,10 +1,15 @@
-import HomePage from "./HomePage";
+import HomePage from "./home/HomePage";
+import { prisma } from "./lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
-export default function Home() {
+export default async function App() {
+
+  const players = await prisma.player.findMany();
+  const gameweeks = await prisma.gameweek.findMany();
+  const gameweekstats = await prisma.gameweekstat.findMany();
 
   return (
-    <HomePage></HomePage>
+    <HomePage players={players} gameweeks={gameweeks} gameweekstats={gameweekstats}></HomePage>
   );
 }

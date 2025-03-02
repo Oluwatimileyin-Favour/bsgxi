@@ -2,10 +2,11 @@
 
 import { useState, useRef } from "react";
 import { Gameweek, Gameweekstat, Player } from "@prisma/client";
+import Emojis from "../lib/constants/emojis";
 
-export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {players: Player[], gameweek: Gameweek, teamBlack: Gameweekstat[], teamWhite: Gameweekstat[]}){
+export default function Teamsheet({players, gameweek, gameweekstats}: {players: Player[], gameweek: Gameweek, gameweekstats: Gameweekstat[]}){
 
-    const [chosenPlayerStats, updateChosenPlayerStats] = useState<Gameweekstat>(teamBlack[0]);
+    const [chosenPlayerStats, updateChosenPlayerStats] = useState<Gameweekstat>(gameweekstats[0]);
     const [isPlayerSelected, updateSelectionStatus] = useState<boolean>(false);
     const [nominateForMotm, updateNominateForMotmStatus] = useState<boolean>(false);
     const [enterGoals, updateEnterGoalsStatus] = useState<boolean>(false);
@@ -19,6 +20,14 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
     const chosenPlayer = players.find(player => player.playerID === chosenPlayerStats.playerID)
 
     const motm: number = gameweek.motm ?? -1;
+
+    const teamBlack: Gameweekstat[] = gameweekstats.filter(stat => {
+        return stat.team === false
+    }) ?? []
+    
+    const teamWhite: Gameweekstat[] = gameweekstats.filter(stat => {
+        return stat.team === true
+    }) ?? []
 
     const handleClick = (stats: Gameweekstat) => {
         if(gameweek.isactive){
@@ -121,33 +130,53 @@ export default function Teamsheet({players, gameweek, teamBlack, teamWhite}: {pl
     }
 
     return (
-        <div className="flex justify-around mt-5">
+        <div className="flex justify-center mt-5">
             {
-                !isPlayerSelected && 
+                !isPlayerSelected && gameweek.gametype.trim() === "Regular" &&
                 <>
-                    <div>
-                        <h3 className="font-bold text-xl text-rose-900">Team Black ({gameweek.blackscore} ⚽)</h3>
-                        <ul className="flex flex-col gap-4 mt-2">
+                    <div className="flex-1 text-center">
+                        <h3 className="font-bold text-xl text-rose-900">Team Black {<span className="hidden md:inline">({gameweek.blackscore} {Emojis.goalEmoji})</span>}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 md:hidden">{gameweek.blackscore} {Emojis.goalEmoji}</h3>
+                        <ul className="flex flex-col gap-y-4 mt-2">
                             {teamBlack.map((teamBlackPlayer) => (
                                 <li key={teamBlackPlayer.playerID} className="rounded-lg hover:bg-gray-200 cursor-pointer font-medium"
                                     onClick={() => handleClick(teamBlackPlayer)}
                                 >
-                                   {(teamBlackPlayer.playerID === motm) && <span>👑</span>} {(teamBlackPlayer.playerID != motm && teamBlackPlayer.nominated) && <span>🦾</span>} {players.find(player => player.playerID === teamBlackPlayer.playerID)?.firstname} { (teamBlackPlayer.goals_scored ?? 0) > 0 && <span>- {teamBlackPlayer.goals_scored} ⚽</span>} 
+                                   {(teamBlackPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} {(teamBlackPlayer.playerID != motm && teamBlackPlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} {players.find(player => player.playerID === teamBlackPlayer.playerID)?.firstname} { (teamBlackPlayer.goals_scored ?? 0) > 0 && <span>- {teamBlackPlayer.goals_scored} {Emojis.goalEmoji}</span>} 
                                 </li>
                             ))}
                         </ul>
                     </div>
-                    <div>
-                            <h3 className="font-bold text-xl text-rose-900">Team White ({gameweek.whitescore} ⚽)</h3>
-                            <ul className="flex flex-col gap-4 mt-2">
-                                {teamWhite.map((teamWhitePlayer) => (
-                                    <li key={teamWhitePlayer.playerID} className="rounded-lg hover:bg-gray-200 cursor-pointer font-medium"
-                                        onClick={() => handleClick(teamWhitePlayer)}
-                                    >
-                                         {(teamWhitePlayer.playerID === motm) && <span>👑</span>} {(teamWhitePlayer.playerID != motm && teamWhitePlayer.nominated) && <span>🦾</span>} {players.find(player => player.playerID === teamWhitePlayer.playerID)?.firstname} { (teamWhitePlayer.goals_scored ?? 0) > 0 && <span>- {teamWhitePlayer.goals_scored} ⚽</span>}
-                                    </li>
-                                ))}
-                            </ul>
+                    <div className="flex-1 text-center">
+                        <h3 className="font-bold text-xl text-rose-900">Team White {<span className="hidden md:inline">({gameweek.whitescore} {Emojis.goalEmoji})</span>}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 md:hidden">{gameweek.whitescore} {Emojis.goalEmoji}</h3>
+                        <ul className="flex flex-col gap-y-4 mt-2">
+                            {teamWhite.map((teamWhitePlayer) => (
+                                <li key={teamWhitePlayer.playerID} className="rounded-lg hover:bg-gray-200 cursor-pointer font-medium"
+                                    onClick={() => handleClick(teamWhitePlayer)}
+                                >
+                                    {(teamWhitePlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} {(teamWhitePlayer.playerID != motm && teamWhitePlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} {players.find(player => player.playerID === teamWhitePlayer.playerID)?.firstname} { (teamWhitePlayer.goals_scored ?? 0) > 0 && <span>- {teamWhitePlayer.goals_scored} {Emojis.goalEmoji}</span>}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </>
+            }
+
+            {
+                !isPlayerSelected && gameweek.gametype.trim() === "Threeteam" &&
+                <>
+                    <div className="flex flex-col items-center">
+                        <h3 className="font-bold text-xl text-rose-900"> Gameweek Players</h3>
+                        <ul className="grid grid-cols-2 gap-4 mt-4">
+                            {gameweekstats.map((gameweekPlayer) => (
+                                <li key={gameweekPlayer.playerID} className="rounded-lg hover:bg-gray-200 cursor-pointer font-medium text-center"
+                                    onClick={() => handleClick(gameweekPlayer)}
+                                >
+                                   {(gameweekPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} {(gameweekPlayer.playerID != motm && gameweekPlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} {players.find(player => player.playerID === gameweekPlayer.playerID)?.firstname} { (gameweekPlayer.goals_scored ?? 0) > 0 && <span>- {gameweekPlayer.goals_scored} {Emojis.goalEmoji}</span>} 
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </>
             }

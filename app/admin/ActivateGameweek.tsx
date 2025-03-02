@@ -3,59 +3,95 @@
 import { useState, useRef } from "react";
 import generateCode from "../util/generateCode";
 import { Player, Gameweek } from "@prisma/client";
+import Dropdown from "../ui/Dropdown";
+import { GameweekType } from "../lib/GameweekTypes";
 
 export default function ActivateGameweek({playerList, nextGameweek }: { playerList: Player[] , nextGameweek: number}) {
 
     const [players, updatePlayerList] = useState<Player[]>(playerList);
     const [teamblack, updateTeamBlack] = useState<Player[]>([]);
     const [teamwhite, updateTeamWhite] = useState<Player[]>([]);
+    const [gameweekPlayers, updateGameweekPlayers] = useState<Player[]>([]);
+    const [gameType, updateGameType] = useState<string>(GameweekType.Regular); 
     const [whiteTurn, updateTurn] = useState<boolean>(true);
     
     const dateRef = useRef<HTMLInputElement | null>(null);
     const adminCodeRef = useRef<HTMLInputElement>(null);
 
     const adminCode =  generateCode();
+
+    const gameweekTypes: string[] = Object.values(GameweekType); 
+
+    const resetState = () => {
+        updatePlayerList(playerList);
+        updateTurn(true);
+        updateTeamBlack([]);
+        updateTeamWhite([]);
+        updateGameweekPlayers([]);
+    }
+
+    const handleUpdateGameType = (idx: number) => {
+        resetState();
+        updateGameType(gameweekTypes[idx]);
+    }
     
     const onclickplayer = (chosenPlayer: Player) => {
         const updatePlayers = players.filter(player => player.playerID != chosenPlayer.playerID);
-        const updateblack = [...teamblack, chosenPlayer];
-        const updatewhite = [...teamwhite, chosenPlayer];
-
         updatePlayerList(updatePlayers);
 
-        if(whiteTurn) {
-            updateTeamWhite(updatewhite);
+        if(gameType === GameweekType.Regular){
+            const updateblack = [...teamblack, chosenPlayer];
+            const updatewhite = [...teamwhite, chosenPlayer];
+    
+            if(whiteTurn) {
+                updateTeamWhite(updatewhite);
+            }
+            else {
+                updateTeamBlack(updateblack);
+            }
+            
+            if(teamwhite.length > teamblack.length){
+                updateTurn(false);
+            }
+            else if(teamblack.length > teamwhite.length){
+                updateTurn(true);
+            }
+            else{
+                updateTurn(!whiteTurn);
+            }
         }
-        else {
-            updateTeamBlack(updateblack);
+
+        else if(gameType === GameweekType.ThreeTeam){
+            const updatedGameweekPlayers = [...gameweekPlayers, chosenPlayer];
+            updateGameweekPlayers(updatedGameweekPlayers)
         }
-        
-        if(teamwhite.length > teamblack.length){
-            updateTurn(false);
-        }
-        else if(teamblack.length > teamwhite.length){
-            updateTurn(true);
-        }
-        else{
-            updateTurn(!whiteTurn);
-        }
+       
     }
 
-    const onclickChosenPlayer = (chosenPlayer: Player, team: number) => {
+    const onclickChosenPlayer = (chosenPlayer: Player, team?: number) => {
         const updatePlayers = [...players, chosenPlayer];
 
         updatePlayerList(updatePlayers);
 
-        if(team === 0){
-            const updatewhite = teamwhite.filter(player => player.playerID != chosenPlayer.playerID);
-            updateTeamWhite(updatewhite);
-            updateTurn(true);
+        if(gameType == GameweekType.Regular){
+                
+            if(team === 0){
+                const updatewhite = teamwhite.filter(player => player.playerID != chosenPlayer.playerID);
+                updateTeamWhite(updatewhite);
+                updateTurn(true);
+            }
+            else {
+                const updateblack = teamblack.filter(player => player.playerID != chosenPlayer.playerID);
+                updateTeamBlack(updateblack);
+                updateTurn(false);
+            }
         }
-        else {
-            const updateblack = teamblack.filter(player => player.playerID != chosenPlayer.playerID);
-            updateTeamBlack(updateblack);
-            updateTurn(false);
+
+        else if(gameType === GameweekType.ThreeTeam){
+            const updatedGameweekPlayers = gameweekPlayers.filter(player => player.playerID != chosenPlayer.playerID);
+            updateGameweekPlayers(updatedGameweekPlayers);
         }
+
     }
 
     const activateGameweek = async () => {
@@ -69,7 +105,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
             gameweekID: nextGameweek,
             date: new Date(dateRef.current?.value ?? "") ?? new Date(),
             isactive: true,
-            gametype: "Regular",
+            gametype: gameType,
             whitescore: 0,
             blackscore: 0,
             motm: null
@@ -111,8 +147,12 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
             return;
         }
 
-        const teamInfo = {gameweekID: gameweekInfo.result.gameweekID, whiteteam: teamwhite, blackteam: teamblack}
+        let teamInfo = {gameweekID: gameweekInfo.result.gameweekID, whiteteam: teamwhite, blackteam: teamblack}
 
+        if(gameType === GameweekType.ThreeTeam){
+            teamInfo = {gameweekID: gameweekInfo.result.gameweekID, whiteteam: gameweekPlayers, blackteam: []}
+        }
+        
         try {
             const response = await fetch("/api/attendance", {
               method: "POST",
@@ -148,34 +188,58 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                     ))}
                 </ul>
             </div>
-        
-            <div className="flex justify-between w-[300px] md:w-[400px] h-[500px] rounded-lg shadow-md bg-gray-100 p-4">
+
+            {
+                gameType === GameweekType.Regular &&
+
+                    <div className="flex justify-between w-[300px] md:w-[400px] h-[500px] overflow-y-auto rounded-lg shadow-md bg-gray-100 p-4">
+                    
+                    <ul>
+                        <h3 className="text-center font-bold text-xl text-rose-900">Team White</h3>
+                        {teamwhite.map( (player) => (
+                            <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 0)}>
+                                {player.firstname}
+                            </li>
+                        ))}
+                    </ul>
+
+                    <ul>
+                        <h3 className="text-center font-bold text-xl text-rose-900">Team Black</h3>
+                        {teamblack.map( (player) => (
+                            <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 1)}>
+                                {player.firstname}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
                 
-                <ul>
-                    <h3 className="text-center font-bold text-xl text-rose-900">Team White</h3>
-                    {teamwhite.map( (player) => (
-                        <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 0)}>
-                            {player.firstname}
-                        </li>
-                    ))}
-                </ul>
+            }
 
-                <ul>
-                    <h3 className="text-center font-bold text-xl text-rose-900">Team Black</h3>
-                    {teamblack.map( (player) => (
-                        <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 1)}>
-                            {player.firstname}
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            { 
+                gameType === GameweekType.ThreeTeam &&      
 
-            <div className="flex flex-col w-[300px] h-[250px] self-center justify-around items-center shadow-md bg-gray-100">
+                    <div className="flex flex-col rounded-lg shadow-md bg-gray-100 py-4 px-10 h-[500px] overflow-y-auto">
+                        <h3 className="text-center font-bold text-xl text-rose-900">Gameweek Players</h3>
+                        <ul>
+                            {gameweekPlayers.map( (player) => (
+                                <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player)}>
+                                    {player.firstname}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    
+            }
+        
+           
+
+            <div className="flex flex-col gap-5 w-[300px] p-2 self-center justify-around items-center shadow-md bg-gray-100">
+
+                <Dropdown menuItems={Object.values(GameweekType)} selectedItem={gameType} reactToSelection={handleUpdateGameType} displayTextSize="text-xl"></Dropdown>
 
                 <input 
                     type="date" 
                     ref={dateRef}
-                    placeholder="date"
                     className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500 transition" 
                 />
 
