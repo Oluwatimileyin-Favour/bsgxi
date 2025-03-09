@@ -5,7 +5,7 @@ export default function PotmLeaderboard({rankings}: {rankings: PlayerWithMonthPo
 
     return (
       <div className="w-[350px] shadow-lg rounded-xl p-4">
-        <h2 className="text-2xl font-bold text-center text-rose-500 mb-3"> March POTM {Emojis.potmLeaderBoardEmoji} </h2>
+        <h2 className="text-2xl font-bold text-center text-orange-600 mb-3"> March POTM {Emojis.potmLeaderBoardEmoji} </h2>
         {/* <h2 className="text-2xl font-bold text-center text-sky-600 mb-3">🤩 March {Emojis.potmLeaderBoardEmoji}</h2> */}
         <div className="h-[400px] overflow-y-auto">
           <ul className="flex flex-col gap-2">
