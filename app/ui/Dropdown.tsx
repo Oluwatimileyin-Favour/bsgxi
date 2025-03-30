@@ -25,7 +25,6 @@ export default function Dropdown({menuItems, selectedItem, reactToSelection, dis
           ))}
         </ul>
       }
-     
     </div>
   )
 }

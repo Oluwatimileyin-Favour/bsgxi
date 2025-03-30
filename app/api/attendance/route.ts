@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Player} from "@prisma/client";
-import { GameweekStat } from "@/app/models/GameweekStat";
+import { GameweekStat } from "@/app/interfaces/GameweekStat";
 import { prisma } from "@/app/lib/prisma";
 
 export async function POST(req: Request) {

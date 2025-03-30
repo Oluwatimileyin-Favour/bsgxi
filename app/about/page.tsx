@@ -1,6 +1,5 @@
 import { lusitana } from "../ui/fonts" 
 
-
 export default function AboutPage(){
 
     return (
