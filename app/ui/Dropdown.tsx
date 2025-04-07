@@ -19,7 +19,7 @@ export default function Dropdown({menuItems, selectedItem, reactToSelection, dis
       </button>
       {
         showDropDown && 
-        <ul className="shadow-md rounded-lg">
+        <ul className="shadow-md rounded-lg h-[200px] w-[200px] overflow-y-auto">
           {menuItems.map((item, index) => (
             <li key={item}  className="p-2 rounded-lg hover:cursor-pointer hover:bg-rose-200" onClick={() => handleSelectItem(index)}>{item}</li>
           ))}

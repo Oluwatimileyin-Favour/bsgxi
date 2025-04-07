@@ -130,7 +130,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
     }
 
     return (
-        <div className="flex justify-center mt-5">
+        <div className="flex justify-center mt-5 w-[95%]">
             {
                 !isPlayerSelected && gameweek.gametype.trim() === "Regular" &&
                 <>

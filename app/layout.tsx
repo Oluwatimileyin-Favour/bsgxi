@@ -15,11 +15,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-[100%]">
-      <body
-        className={`${inter.className} antialiased h-[100%]`}
-      >
-        <Navbar></Navbar>
-        {children}
+      <body className={`${inter.className} antialiased h-[100%]`}>
+        <div className="flex flex-col h-[100%]">
+          <header className="flex items-center h-[4rem]">
+            <Navbar/>
+          </header>
+          {/* children containers can set height to 100% to cover all area under navbar */}
+          <main className="h-[calc(100%-4rem)]"> 
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );

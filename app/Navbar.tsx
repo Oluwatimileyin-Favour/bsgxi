@@ -2,8 +2,8 @@ import Link from 'next/link';
 
 const Navbar = () => {
     return (
-      <nav className="shadow-md w-[100%] lg:px-16 xs:px-6">
-          <div className="flex justify-between items-center h-16">
+      <nav className="flex flex-col justify-center shadow-md lg:px-16 xs:px-6 w-[100%] h-[100%]">
+          <div className="flex justify-between items-center">
 
             <Link href="/" className="text-2xl font-bold text-red-500">
               BSG-XI

@@ -34,7 +34,7 @@ export default async function page(){
     }
 
     return (
-        <div className="flex justify-around">
+        <div className="flex justify-around h-[100%]">
             {
                 !lastGameweekIsActive &&
                 <ActivateGameweek playerList={allplayers} nextGameweek={gameweeks.length}></ActivateGameweek>

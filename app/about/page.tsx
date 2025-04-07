@@ -3,7 +3,7 @@ import { lusitana } from "../ui/fonts"
 export default function AboutPage(){
 
     return (
-        <div className={`${lusitana.className} flex flex-col justify-center items-center bg-cover bg-center h-[calc(100vh-4rem)] overflow-hidden`}
+        <div className={`${lusitana.className} flex flex-col justify-center items-center bg-cover bg-center h-[100%] overflow-hidden`}
         style={{ backgroundImage: "url('brown.jpg')" }}
         >
             <div className="flex flex-col gap-3 text-xl font-semibold text-white p-3">

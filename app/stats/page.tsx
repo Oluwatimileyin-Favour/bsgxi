@@ -12,7 +12,7 @@ export default async function StatsPage(){
     const sortedPlayersByPoints = [...players].sort((a, b) => (b.totalpoints || 0) - (a.totalpoints || 0));
 
     return (
-        <div className="flex flex-col p-5 justify-around items-center gap-3 md:flex-row md:justify-center lg:h-[calc(100vh-4rem)] ">
+        <div className="flex flex-col p-5 justify-around items-center gap-3 md:flex-row md:justify-center h-[100%]">
             <BallondOrBoard rankings={sortedPlayersByPoints}></BallondOrBoard>
             <GoldenBootBoard rankings={sortedPlayersByGoals}></GoldenBootBoard>  
         </div>
