@@ -13,7 +13,7 @@ export default function PotmLeaderboard({rankings}: {rankings: PlayerWithMonthPo
                 key={index} 
                 className={`p-2 rounded-lg shadow-sm transition-all ${
                   index < 3 ? "bg-gray-200 font-semibold" : "bg-gray-100"
-                } hover:bg-rose-200`}
+                } fine-pointer:hover:bg-rose-200`}
               >
                 {playerWithMonthPoint.player.firstname} - {playerWithMonthPoint.monthPoints} pts
               </li>

@@ -24,14 +24,14 @@ export default function Slider({sliderItems, selectedIdx, reactToSelection}: {sl
     return (
         // take note of margin, if this is going to be reused 
         <div className="mt-5 flex items-center justify-center w-[300px] rounded-lg text-white">
-            <span className="flex justify-center min-w-[50px] max-w-[150px] p-2 bg-sky-400 rounded-lg text-center shrink-0 hover:bg-rose-200 cursor-pointer" onClick={handleSlideLeft}><HiOutlineChevronLeft/></span>
+            <span className="flex justify-center min-w-[50px] max-w-[150px] p-2 bg-sky-400 rounded-lg text-center shrink-0 fine-pointer:hover:bg-rose-200 cursor-pointer" onClick={handleSlideLeft}><HiOutlineChevronLeft/></span>
             <ul className="flex justify-center gap-2 p-2">
                 {sliderItems.map((item, index) => (
                     index >= startIdx && index < (startIdx + numItemsPerSlide) &&
 
                     (
                         (index === selectedIdx && 
-                            <li key={item}  className="min-w-[50px] max-w-[150px] p-1 bg-red-400 rounded-lg text-center shrink-0 hover:bg-rose-200 cursor-pointer" onClick={() => reactToSelection(index)}>
+                            <li key={item}  className="min-w-[50px] max-w-[150px] p-1 bg-red-400 rounded-lg text-center shrink-0 fine-pointer:hover:bg-rose-200 cursor-pointer" onClick={() => reactToSelection(index)}>
                                 {item}
                             </li>
                         )
@@ -39,14 +39,14 @@ export default function Slider({sliderItems, selectedIdx, reactToSelection}: {sl
                         ||
 
                         (
-                            <li key={item}  className="min-w-[50px] max-w-[150px] p-1 bg-sky-400 rounded-lg text-center shrink-0 hover:bg-rose-200 cursor-pointer" onClick={() => reactToSelection(index)}>
+                            <li key={item}  className="min-w-[50px] max-w-[150px] p-1 bg-sky-400 rounded-lg text-center shrink-0 fine-pointer:hover:bg-rose-200 cursor-pointer" onClick={() => reactToSelection(index)}>
                                 {item}
                             </li>
                         )
                     )
                 ))}
             </ul>
-            <span className="flex justify-center min-w-[50px] max-w-[150px] p-2 bg-sky-400 rounded-lg text-center shrink-0 hover:bg-rose-200 cursor-pointer" onClick={handleSlideRight}><HiOutlineChevronRight/></span>
+            <span className="flex justify-center min-w-[50px] max-w-[150px] p-2 bg-sky-400 rounded-lg text-center shrink-0 fine-pointer:hover:bg-rose-200 cursor-pointer" onClick={handleSlideRight}><HiOutlineChevronRight/></span>
         </div>
     )
 }

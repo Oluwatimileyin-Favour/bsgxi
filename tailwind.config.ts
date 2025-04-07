@@ -14,6 +14,11 @@ export default {
       },
       screens: {
         'xs': '350px', // Custom breakpoint for extra small screens
+         // Fine pointer (e.g., mouse)
+         'fine-pointer': { 'raw': '(hover: hover) and (pointer: fine)' },
+
+         // Coarse pointer (e.g., touch)
+         'coarse-pointer': { 'raw': '(hover: none) and (pointer: coarse)' },
       },
     },
   },
