@@ -31,7 +31,7 @@ export default function Slider({sliderItems, selectedIdx, reactToSelection}: {sl
 
                     (
                         (index === selectedIdx && 
-                            <li key={item}  className="min-w-[50px] max-w-[150px] p-1 bg-red-400 rounded-lg text-center shrink-0 fine-pointer:hover:bg-rose-200 cursor-pointer" onClick={() => reactToSelection(index)}>
+                            <li key={item}  className="min-w-[50px] max-w-[150px] p-1 bg-rose-500 rounded-lg text-center shrink-0 fine-pointer:hover:bg-rose-200 cursor-pointer" onClick={() => reactToSelection(index)}>
                                 {item}
                             </li>
                         )
