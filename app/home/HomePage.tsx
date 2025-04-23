@@ -36,17 +36,17 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
     const sortedPlayersByMonthPoints: PlayerWithMonthPoint[] = [...playersWithMonthPoints].sort((a, b) => (b.monthPoints || 0) - (a.monthPoints || 0));
 
     return (
-            <div className="flex flex-col justify-around items-center lg:flex-row py-4">
+            <div className="flex flex-col justify-around items-center lg:flex-row py-4 gap-6 min-h-[100%]">
                 {
                 lastGameweekIdx < 0 ? 
                     
                         <div className="flex h-[400px] justify-center items-center p-10">
-                            <h2 className="font-bold text-4xl text-rose-900 mb-2 text-center">Season has not begun {Emojis.seasonNotBegunEmoji}</h2>
+                            <h2 className="font-bold text-4xl text-rose-900 dark:text-red-600 mb-2 text-center">Season has not begun {Emojis.seasonNotBegunEmoji}</h2>
                         </div>
                     
                     :
-                        <div className="flex flex-col gap-2 items-center md:w-[550px] px-2">
-                            <h2 className="font-bold text-3xl text-rose-900">Gameweek {selectedGameweekIdx + 1}</h2>
+                        <div className="flex flex-col gap-2 justify-center items-center md:w-[550px] px-2 h-[100%]">
+                            <h2 className="font-bold text-3xl text-rose-900 dark:text-red-600">Gameweek {selectedGameweekIdx + 1}</h2>
                             {/* <Dropdown menuItems={gameweeks.map((_, index) => `Gameweek ${index + 1}`)} selectedItem={`Gameweek ${selectedGameweekIdx + 1}`} reactToSelection={updateSelectedGameweekIdx} displayTextSize="text-3xl"></Dropdown> */}
                             <p className="font-semibold">{gameweeks[selectedGameweekIdx].date.toDateString()}</p>
                             <p className="font-semibold">Gametype: {gameweeks[selectedGameweekIdx].gametype}</p>
@@ -57,9 +57,7 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
                             <Slider sliderItems={[...gameweeks].map((_, index) => `${index + 1}`)} selectedIdx={selectedGameweekIdx} reactToSelection={updateSelectedGameweekIdx}></Slider>
                         </div>  
                 }
-                <div className="flex flex-col items-center xs:mt-10 lg:flex-row lg:justify-between">
-                    <PotmLeaderboard rankings={sortedPlayersByMonthPoints}></PotmLeaderboard>
-                </div>
+                <PotmLeaderboard rankings={sortedPlayersByMonthPoints}></PotmLeaderboard>
             </div>
     )
 }

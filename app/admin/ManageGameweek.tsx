@@ -163,7 +163,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
 
                     <div className="flex flex-col justify-between items-center">
                         <ul>
-                            <h3 className="text-center font-bold text-xl text-rose-900">Nominees</h3>
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-600">Nominees</h3>
                             {nominees.map( (player) => (
                                 <li key={player.playerID} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player)}>
                                     {player.firstname}
@@ -179,16 +179,16 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                             }   
                     </div>
 
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center gap-6">
                         <form
-                            className="max-w-sm mx-auto bg-white rounded-lg p-6"
+                            className="max-w-sm mx-auto dark:border-red-500 dark:border-4 dark:bg-inherit rounded-lg p-6"
                             onSubmit={updateFullTimeScore}
                             method="POST"
                         >
                             <div className="mb-4 space-y-5">
                                 <label
                                 htmlFor="textInput"
-                                className="block text-lg font-bold text-red-700 mb-2"
+                                className="block text-lg font-bold text-red-700 dark:text-red-500 mb-2"
                                 >
                                 Update full time score
                                 </label>
@@ -200,7 +200,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                                 name="textInput"
                                 placeholder="team white"
                                 defaultValue={gameweek.whitescore ?? 0}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
 
                                 <input
@@ -210,7 +210,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                                 name="textInput"
                                 placeholder="team black"
                                 defaultValue={gameweek.blackscore ?? 0}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
 
                                 <input
@@ -219,18 +219,18 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                                 ref={adminCodeRef}
                                 name="textInput"
                                 placeholder="admin code"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
                             <button
                                 type="submit"
-                                className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full my-2 bg-blue-500 dark:bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 dark:hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 Update
                             </button>
                         </form>
 
-                        <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-20 w-60 my-auto" 
+                        <button className="px-4 py-2 rounded-2xl bg-rose-900 dark:bg-red-500 text-white hover:bg-rose-400 transition shadow-md h-20 w-60 my-auto" 
                             onClick={() => updateCloseGameweekStatus(true)}
                         >
                             Close Gameweek
@@ -245,7 +245,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
 
                 <div className="flex flex-col gap-4 lg:flex-row h-[500px]">
                         <ul>
-                            <h3 className="text-center font-bold text-xl text-rose-900">Nominees</h3>
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-600">Nominees</h3>
                             {nominees.map( (player) => (
                                 <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player)}>
                                     {player.firstname}
@@ -295,13 +295,13 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                 closeGameweek &&
 
                 <form
-                    className="max-w-sm mx-auto bg-white shadow-md rounded-lg p-6"
+                    className="max-w-sm mx-auto dark:border-red-500 dark:border-4 dark:bg-inherit  shadow-md rounded-lg p-6"
                     onSubmit={handleCloseGameweek}
                 >
                     <div className="mb-4">
                         <label
                         htmlFor="textInput"
-                        className="block text-lg font-bold text-red-700 mb-2"
+                        className="block text-lg font-bold text-red-700 dark:text-red-500 mb-2"
                         >
                         Are you sure you want to close the gameweek
                         </label>
@@ -311,7 +311,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                             ref={adminCodeRef}
                             name="textInput"
                             placeholder="admin code"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
                     <button

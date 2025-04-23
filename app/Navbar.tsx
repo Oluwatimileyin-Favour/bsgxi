@@ -12,25 +12,25 @@ const Navbar = () => {
             <div className="space-x-6">
               <Link
                   href="/"
-                  className="text-gray-700 hover:text-blue-500 font-medium"
+                  className="hover:text-blue-500 font-medium"
               >
                   Home
               </Link>
               <Link
                 href="stats"
-                className="text-gray-700 hover:text-blue-500 font-medium"
+                className="hover:text-blue-500 font-medium"
               >
                 Stats
               </Link>
               <Link 
                 href="admin"
-                className="text-gray-700 hover:text-blue-500 font-medium hidden md:inline"
+                className="hover:text-blue-500 font-medium hidden md:inline"
               >
                 Admin
               </Link> 
               <Link
                 href="about"
-                className="text-gray-700 hover:text-blue-500 font-medium"
+                className="hover:text-blue-500 font-medium"
               >
                 About
               </Link>

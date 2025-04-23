@@ -130,16 +130,16 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
     }
 
     return (
-        <div className="flex justify-center mt-5 w-[95%]">
+        <div className="flex justify-center mt-5 w-[95%] lg:max-h-[320px] overflow-y-auto">
             {
                 !isPlayerSelected && gameweek.gametype.trim() === "Regular" &&
                 <>
                     <div className="flex-1 text-center">
-                        <h3 className="font-bold text-xl text-rose-900">Team Black {<span className="hidden md:inline">({gameweek.blackscore} {Emojis.goalEmoji})</span>}</h3>
-                        <h3 className="font-bold text-xl text-rose-900 md:hidden">{gameweek.blackscore} {Emojis.goalEmoji}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 dark:text-red-600">Team Black {<span className="hidden md:inline">({gameweek.blackscore} {Emojis.goalEmoji})</span>}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 dark:text-red-600 md:hidden">{gameweek.blackscore} {Emojis.goalEmoji}</h3>
                         <ul className="flex flex-col gap-y-4 mt-2">
                             {teamBlack.map((teamBlackPlayer) => (
-                                <li key={teamBlackPlayer.playerID} className="rounded-lg hover:bg-gray-200 cursor-pointer font-medium"
+                                <li key={teamBlackPlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium"
                                     onClick={() => handleClick(teamBlackPlayer)}
                                 >
                                    {(teamBlackPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} {(teamBlackPlayer.playerID != motm && teamBlackPlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} {players.find(player => player.playerID === teamBlackPlayer.playerID)?.firstname} { (teamBlackPlayer.goals_scored ?? 0) > 0 && <span>- {teamBlackPlayer.goals_scored} {Emojis.goalEmoji}</span>} 
@@ -148,11 +148,11 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
                         </ul>
                     </div>
                     <div className="flex-1 text-center">
-                        <h3 className="font-bold text-xl text-rose-900">Team White {<span className="hidden md:inline">({gameweek.whitescore} {Emojis.goalEmoji})</span>}</h3>
-                        <h3 className="font-bold text-xl text-rose-900 md:hidden">{gameweek.whitescore} {Emojis.goalEmoji}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 dark:text-red-600">Team White {<span className="hidden md:inline">({gameweek.whitescore} {Emojis.goalEmoji})</span>}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 dark:text-red-600 md:hidden">{gameweek.whitescore} {Emojis.goalEmoji}</h3>
                         <ul className="flex flex-col gap-y-4 mt-2">
                             {teamWhite.map((teamWhitePlayer) => (
-                                <li key={teamWhitePlayer.playerID} className="rounded-lg hover:bg-gray-200 cursor-pointer font-medium"
+                                <li key={teamWhitePlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium"
                                     onClick={() => handleClick(teamWhitePlayer)}
                                 >
                                     {(teamWhitePlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} {(teamWhitePlayer.playerID != motm && teamWhitePlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} {players.find(player => player.playerID === teamWhitePlayer.playerID)?.firstname} { (teamWhitePlayer.goals_scored ?? 0) > 0 && <span>- {teamWhitePlayer.goals_scored} {Emojis.goalEmoji}</span>}
@@ -170,7 +170,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
                         <h3 className="font-bold text-xl text-rose-900"> Gameweek Players</h3>
                         <ul className="grid grid-cols-2 gap-4 mt-4">
                             {gameweekstats.map((gameweekPlayer) => (
-                                <li key={gameweekPlayer.playerID} className="rounded-lg hover:bg-gray-200 cursor-pointer font-medium text-center"
+                                <li key={gameweekPlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium text-center"
                                     onClick={() => handleClick(gameweekPlayer)}
                                 >
                                    {(gameweekPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} {(gameweekPlayer.playerID != motm && gameweekPlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} {players.find(player => player.playerID === gameweekPlayer.playerID)?.firstname} { (gameweekPlayer.goals_scored ?? 0) > 0 && <span>- {gameweekPlayer.goals_scored} {Emojis.goalEmoji}</span>} 
@@ -210,18 +210,18 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
                 isPlayerSelected && (enterGoals || !chosenPlayerStats.nominated) && 
                 <form
                     onSubmit={updateGoals}
-                    className="max-w-sm mx-auto bg-white shadow-md rounded-lg p-6"
+                    className="max-w-sm mx-auto dark:border-sky-400 dark:border-2 shadow-md rounded-lg p-6"
                     >
                     <div className="mb-4 space-y-2">
                         <label
                         htmlFor="textInput"
-                        className="block text-lg font-bold text-red-700 mb-2"
+                        className="block text-lg font-bold text-red-700 dark:text-sky-400 mb-2"
                         >
                         {chosenPlayer?.firstname}
                         </label>
                         <label
                         htmlFor="textInput"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 dark:text-sky-700 mb-2"
                         >
                         how many goals did you score?
                         </label>
@@ -231,7 +231,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
                         ref={goalsScoredRef}
                         name="textInput"
                         placeholder="goals"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                          <input
                         type="text"
@@ -239,7 +239,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
                         ref={playerCodeRef}
                         name="textInput"
                         placeholder="your code"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
                     <button
@@ -261,12 +261,12 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
             { isPlayerSelected && nominateForMotm && 
                 <form
                     onSubmit={handleNomination}
-                    className="max-w-sm mx-auto bg-white shadow-md rounded-lg p-6"
+                    className="max-w-sm mx-auto shadow-md rounded-lg p-6 dark:border-sky-400 dark:border-2"
                 >
                     <div className="mb-4">
                         <label
                         htmlFor="textInput"
-                        className="block text-lg font-bold text-red-700 mb-2"
+                        className="block text-lg font-bold text-red-700 dark:text-sky-400 mb-2"
                         >
                         Are you sure you want to nominate {chosenPlayer?.firstname} for MOTM?
                         </label>
@@ -276,7 +276,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
                         ref={playerCodeRef}
                         name="textInput"
                         placeholder="your code"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
                     <button

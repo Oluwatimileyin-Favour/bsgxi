@@ -34,15 +34,12 @@ export default async function page(){
     }
 
     return (
-        <div className="flex justify-around h-[100%]">
+        <div className='flex justify-center items-center min-h-[100%]'>
             {
-                !lastGameweekIsActive &&
-                <ActivateGameweek playerList={allplayers} nextGameweek={gameweeks.length}></ActivateGameweek>
-            }
-           
-            {
-                lastGameweekIsActive &&
-                <ManageGameweek gameweekPlayerList={gameweekPlayers} gameweek={gameweeks[lastGameweek]} nomineeList={nomineeList} haveNominatedPlayers={haveNominatedPlayers}></ManageGameweek>
+                lastGameweekIsActive ?  
+                    <ManageGameweek gameweekPlayerList={gameweekPlayers} gameweek={gameweeks[lastGameweek]} nomineeList={nomineeList} haveNominatedPlayers={haveNominatedPlayers}></ManageGameweek>
+                :
+                    <ActivateGameweek playerList={allplayers} nextGameweek={gameweeks.length}></ActivateGameweek>
             }
         </div>
        

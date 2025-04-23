@@ -176,71 +176,72 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
     
 
     return (
-        <div className="flex flex-col gap-4 items-center md:flex-row md:justify-around w-[100%] p-10">
+        <div className="w-[100%] h-[100%] flex flex-col gap-4 items-center lg:flex-row md:justify-around p-10 max-w-[1441px]">
 
-            <div className="w-[300px] h-[500px] overflow-y-auto bg-gray-100 p-4 rounded-lg shadow-md">
-                <h3 className="text-center font-bold text-xl text-rose-900">Click on player to select</h3>
-                <ul className="space-y-2">
-                    {players.map( (player) => (
-                        <li key={player.code} className="p-[10px] rounded-lg hover:bg-sky-400 cursor-pointer text-center" onClick={() => onclickplayer(player)}>
-                            {player.firstname}
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            <div className="flex flex-col gap-4 items-center md:flex-row md:justify-around md:w-[100%] lg:w-[60%]">
 
-            {
-                gameType === GameweekType.Regular &&
-
-                    <div className="flex justify-between w-[300px] md:w-[400px] h-[500px] overflow-y-auto rounded-lg shadow-md bg-gray-100 p-4">
-                    
-                    <ul>
-                        <h3 className="text-center font-bold text-xl text-rose-900">Team White</h3>
-                        {teamwhite.map( (player) => (
-                            <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 0)}>
-                                {player.firstname}
-                            </li>
-                        ))}
-                    </ul>
-
-                    <ul>
-                        <h3 className="text-center font-bold text-xl text-rose-900">Team Black</h3>
-                        {teamblack.map( (player) => (
-                            <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 1)}>
+                <div className="w-[300px] min-h-[300px] h-[500px] overflow-y-auto bg-gray-100 p-4 rounded-lg shadow-md dark:border-sky-400 dark:border-4 dark:bg-inherit">
+                    <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-500">Click on player to select</h3>
+                    <ul className="space-y-2">
+                        {players.map( (player) => (
+                            <li key={player.code} className="p-[10px] rounded-lg hover:bg-sky-400 dark:hover:bg-sky-900 cursor-pointer text-center" onClick={() => onclickplayer(player)}>
                                 {player.firstname}
                             </li>
                         ))}
                     </ul>
                 </div>
-                
-            }
 
-            { 
-                gameType === GameweekType.ThreeTeam &&      
+                {
+                    gameType === GameweekType.Regular &&
 
-                    <div className="flex flex-col rounded-lg shadow-md bg-gray-100 py-4 px-10 h-[500px] overflow-y-auto">
-                        <h3 className="text-center font-bold text-xl text-rose-900">Gameweek Players</h3>
+                        <div className="flex justify-between w-[300px] min-h-[150px] max-h-[500px] md:h-[500px] overflow-y-auto rounded-lg shadow-md bg-gray-100 p-4 dark:border-sky-400 dark:border-4 dark:bg-inherit">
+                        
                         <ul>
-                            {gameweekPlayers.map( (player) => (
-                                <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player)}>
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-500">Team White</h3>
+                            {teamwhite.map( (player) => (
+                                <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 0)}>
+                                    {player.firstname}
+                                </li>
+                            ))}
+                        </ul>
+
+                        <ul>
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-500">Team Black</h3>
+                            {teamblack.map( (player) => (
+                                <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 1)}>
                                     {player.firstname}
                                 </li>
                             ))}
                         </ul>
                     </div>
                     
-            }
-        
-           
+                }
 
-            <div className="flex flex-col gap-5 w-[300px] p-2 self-center justify-around items-center shadow-md bg-gray-100">
+                { 
+                    gameType === GameweekType.ThreeTeam &&      
+
+                        <div className="flex flex-col rounded-lg shadow-md bg-gray-100 py-4 px-10 min-h-[150px] max-h-[500px] w-[300px] md:h-[500px] overflow-y-auto dark:border-sky-400 dark:border-4 dark:bg-inherit">
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-500">Gameweek Players</h3>
+                            <ul>
+                                {gameweekPlayers.map( (player) => (
+                                    <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player)}>
+                                        {player.firstname}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        
+                }
+            </div>
+           
+            <div className="flex flex-col gap-5 w-[300px] p-2 self-center justify-around items-center shadow-md bg-gray-100 dark:border-sky-400 dark:border-4 dark:bg-inherit">
 
                 <Dropdown menuItems={Object.values(GameweekType)} selectedItem={gameType} reactToSelection={handleUpdateGameType} displayTextSize="text-xl"></Dropdown>
 
                 <input 
                     type="date" 
                     ref={dateRef}
-                    className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500 transition" 
+                    className="px-3 py-2 border border-gray-300 dark:border-sky-400 dark:border-2 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500 transition" 
                 />
 
                 <input
@@ -249,7 +250,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                     ref={adminCodeRef}
                     name="textInput"
                     placeholder="admin code"
-                    className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500"
+                    className="px-3 py-2 border border-gray-300 dark:border-sky-400 dark:border-2 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500"
                 />  
 
                 <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-20 w-[50%]" onClick={saveteamSheets}>

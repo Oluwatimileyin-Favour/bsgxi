@@ -21,6 +21,7 @@ export default {
          'coarse-pointer': { 'raw': '(hover: none) and (pointer: coarse)' },
       },
     },
+    darkMode: 'media'
   },
   plugins: [],
 } satisfies Config;
