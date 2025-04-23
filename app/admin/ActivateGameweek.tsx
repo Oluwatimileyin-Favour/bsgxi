@@ -181,7 +181,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
             <div className="flex flex-col gap-4 items-center md:flex-row md:justify-around md:w-[100%] lg:w-[60%]">
 
                 <div className="w-[300px] min-h-[300px] h-[500px] overflow-y-auto bg-gray-100 p-4 rounded-lg shadow-md dark:border-sky-400 dark:border-4 dark:bg-inherit">
-                    <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-500">Click on player to select</h3>
+                    <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">Click on player to select</h3>
                     <ul className="space-y-2">
                         {players.map( (player) => (
                             <li key={player.code} className="p-[10px] rounded-lg hover:bg-sky-400 dark:hover:bg-sky-900 cursor-pointer text-center" onClick={() => onclickplayer(player)}>
@@ -197,7 +197,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                         <div className="flex justify-between w-[300px] min-h-[150px] max-h-[500px] md:h-[500px] overflow-y-auto rounded-lg shadow-md bg-gray-100 p-4 dark:border-sky-400 dark:border-4 dark:bg-inherit">
                         
                         <ul>
-                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-500">Team White</h3>
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">Team White</h3>
                             {teamwhite.map( (player) => (
                                 <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 0)}>
                                     {player.firstname}
@@ -206,7 +206,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                         </ul>
 
                         <ul>
-                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-500">Team Black</h3>
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">Team Black</h3>
                             {teamblack.map( (player) => (
                                 <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player, 1)}>
                                     {player.firstname}
@@ -221,7 +221,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
                     gameType === GameweekType.ThreeTeam &&      
 
                         <div className="flex flex-col rounded-lg shadow-md bg-gray-100 py-4 px-10 min-h-[150px] max-h-[500px] w-[300px] md:h-[500px] overflow-y-auto dark:border-sky-400 dark:border-4 dark:bg-inherit">
-                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-500">Gameweek Players</h3>
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">Gameweek Players</h3>
                             <ul>
                                 {gameweekPlayers.map( (player) => (
                                     <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player)}>

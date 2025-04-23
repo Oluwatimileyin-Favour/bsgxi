@@ -4,8 +4,8 @@ import { PlayerWithMonthPoint } from "../interfaces/PlayerWithMonthPoint";
 export default function PotmLeaderboard({rankings}: {rankings: PlayerWithMonthPoint[]}){
 
     return (
-      <div className="w-[350px] shadow-lg rounded-xl p-4 dark:border-red-600 dark:border-4">
-        <h2 className="text-2xl font-bold text-center text-orange-600 dark:text-red-500 mb-3"> April POTM {Emojis.potmLeaderBoardEmoji} </h2>
+      <div className="w-[350px] shadow-lg rounded-xl p-4 dark:border-rose-500 dark:border-4">
+        <h2 className="text-2xl font-bold text-center text-orange-600 dark:text-rose-500 mb-3"> April POTM {Emojis.potmLeaderBoardEmoji} </h2>
         <div className="h-[400px] overflow-y-auto">
           <ul className="flex flex-col gap-2">
             {rankings.map((playerWithMonthPoint, index) => (

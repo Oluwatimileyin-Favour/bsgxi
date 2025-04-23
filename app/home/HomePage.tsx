@@ -41,12 +41,12 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
                 lastGameweekIdx < 0 ? 
                     
                         <div className="flex h-[400px] justify-center items-center p-10">
-                            <h2 className="font-bold text-4xl text-rose-900 dark:text-red-600 mb-2 text-center">Season has not begun {Emojis.seasonNotBegunEmoji}</h2>
+                            <h2 className="font-bold text-4xl text-rose-900 dark:text-rose-500 mb-2 text-center">Season has not begun {Emojis.seasonNotBegunEmoji}</h2>
                         </div>
                     
                     :
                         <div className="flex flex-col gap-2 justify-center items-center md:w-[550px] px-2 h-[100%]">
-                            <h2 className="font-bold text-3xl text-rose-900 dark:text-red-600">Gameweek {selectedGameweekIdx + 1}</h2>
+                            <h2 className="font-bold text-3xl text-rose-900 dark:text-rose-500">Gameweek {selectedGameweekIdx + 1}</h2>
                             {/* <Dropdown menuItems={gameweeks.map((_, index) => `Gameweek ${index + 1}`)} selectedItem={`Gameweek ${selectedGameweekIdx + 1}`} reactToSelection={updateSelectedGameweekIdx} displayTextSize="text-3xl"></Dropdown> */}
                             <p className="font-semibold">{gameweeks[selectedGameweekIdx].date.toDateString()}</p>
                             <p className="font-semibold">Gametype: {gameweeks[selectedGameweekIdx].gametype}</p>

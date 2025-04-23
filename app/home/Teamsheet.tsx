@@ -135,8 +135,8 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
                 !isPlayerSelected && gameweek.gametype.trim() === "Regular" &&
                 <>
                     <div className="flex-1 text-center">
-                        <h3 className="font-bold text-xl text-rose-900 dark:text-red-600">Team Black {<span className="hidden md:inline">({gameweek.blackscore} {Emojis.goalEmoji})</span>}</h3>
-                        <h3 className="font-bold text-xl text-rose-900 dark:text-red-600 md:hidden">{gameweek.blackscore} {Emojis.goalEmoji}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 dark:text-rose-500">Team Black {<span className="hidden md:inline">({gameweek.blackscore} {Emojis.goalEmoji})</span>}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 dark:text-rose-500 md:hidden">{gameweek.blackscore} {Emojis.goalEmoji}</h3>
                         <ul className="flex flex-col gap-y-4 mt-2">
                             {teamBlack.map((teamBlackPlayer) => (
                                 <li key={teamBlackPlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium"
@@ -148,8 +148,8 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
                         </ul>
                     </div>
                     <div className="flex-1 text-center">
-                        <h3 className="font-bold text-xl text-rose-900 dark:text-red-600">Team White {<span className="hidden md:inline">({gameweek.whitescore} {Emojis.goalEmoji})</span>}</h3>
-                        <h3 className="font-bold text-xl text-rose-900 dark:text-red-600 md:hidden">{gameweek.whitescore} {Emojis.goalEmoji}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 dark:text-rose-500">Team White {<span className="hidden md:inline">({gameweek.whitescore} {Emojis.goalEmoji})</span>}</h3>
+                        <h3 className="font-bold text-xl text-rose-900 dark:text-rose-500 md:hidden">{gameweek.whitescore} {Emojis.goalEmoji}</h3>
                         <ul className="flex flex-col gap-y-4 mt-2">
                             {teamWhite.map((teamWhitePlayer) => (
                                 <li key={teamWhitePlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium"

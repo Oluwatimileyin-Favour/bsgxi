@@ -163,7 +163,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
 
                     <div className="flex flex-col justify-between items-center">
                         <ul>
-                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-600">Nominees</h3>
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">Nominees</h3>
                             {nominees.map( (player) => (
                                 <li key={player.playerID} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player)}>
                                     {player.firstname}
@@ -188,7 +188,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                             <div className="mb-4 space-y-5">
                                 <label
                                 htmlFor="textInput"
-                                className="block text-lg font-bold text-red-700 dark:text-red-500 mb-2"
+                                className="block text-lg font-bold text-red-700 dark:text-rose-500 mb-2"
                                 >
                                 Update full time score
                                 </label>
@@ -245,7 +245,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
 
                 <div className="flex flex-col gap-4 lg:flex-row h-[500px]">
                         <ul>
-                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-red-600">Nominees</h3>
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">Nominees</h3>
                             {nominees.map( (player) => (
                                 <li key={player.code} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickChosenPlayer(player)}>
                                     {player.firstname}
@@ -301,7 +301,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                     <div className="mb-4">
                         <label
                         htmlFor="textInput"
-                        className="block text-lg font-bold text-red-700 dark:text-red-500 mb-2"
+                        className="block text-lg font-bold text-red-700 dark:text-rose-500 mb-2"
                         >
                         Are you sure you want to close the gameweek
                         </label>

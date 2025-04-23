@@ -14,7 +14,7 @@ export default function Dropdown({menuItems, selectedItem, reactToSelection, dis
 
   return (
     <div className="flex flex-col items-center p-2 text-center ml-8">
-      <button className={`flex justify-between font-bold ${displayTextSize} text-rose-900 dark:text-red-500 hover:cursor-pointer p-2 hover:text-rose-600 rounded-md`} onClick={() => toggleDropDownVisibility(!showDropDown)}>
+      <button className={`flex justify-between font-bold ${displayTextSize} text-rose-900 dark:text-rose-500 hover:cursor-pointer p-2 hover:text-rose-600 rounded-md`} onClick={() => toggleDropDownVisibility(!showDropDown)}>
         {selectedItem} {showDropDown ? <span className="py-1 ml-3"><HiChevronUp/></span> : <span className="py-1 ml-3"><HiChevronDown/></span>} 
       </button>
       {
