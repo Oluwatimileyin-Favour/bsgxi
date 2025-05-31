@@ -148,8 +148,8 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                 <>
                     {
                         !haveNominatedPlayers &&
-                        <div className="h-[500px] overflow-y-auto bg-gray-100 p-4 rounded-lg shadow-md">
-                            <h3 className="text-center font-bold text-xl text-rose-900">Click on player to nominate for MOTM</h3>
+                        <div className="h-[500px] overflow-y-auto bg-gray-100 dark:border-red-500 dark:border-4 dark:bg-inherit p-4 rounded-lg shadow-md">
+                            <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">Click on player to nominate for MOTM</h3>
                             <ul className="space-y-2">
                                 {gameweekPlayers.map( (player) => (
                                     <li key={player.code} className="p-[10px] rounded-lg hover:bg-sky-400 cursor-pointer text-center" onClick={() => onclickplayer(player)}>
@@ -196,20 +196,20 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                                 <input
                                 type="number"
                                 id="textInput"
-                                ref={whiteScoreRef}
+                                ref={blackScoreRef}
                                 name="textInput"
-                                placeholder="team white"
-                                defaultValue={gameweek.whitescore ?? 0}
+                                placeholder="team black"
+                                defaultValue={gameweek.blackscore ?? 0}
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
 
                                 <input
                                 type="number"
                                 id="textInput"
-                                ref={blackScoreRef}
+                                ref={whiteScoreRef}
                                 name="textInput"
-                                placeholder="team black"
-                                defaultValue={gameweek.blackscore ?? 0}
+                                placeholder="team white"
+                                defaultValue={gameweek.whitescore ?? 0}
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
 
@@ -243,7 +243,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
             {
                 nominatePlayers &&
 
-                <div className="flex flex-col gap-4 lg:flex-row h-[500px]">
+                <div className="flex flex-col gap-4 lg:flex-row">
                         <ul>
                             <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">Nominees</h3>
                             {nominees.map( (player) => (

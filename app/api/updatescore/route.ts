@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/app/lib/prisma";
+import { updateGameweek } from "@/app/services/db.service";
 
 export async function POST(req: Request) {
   try {
     const { scores } = await req.json();
 
-    const updatedGameweek = await prisma.gameweek.update({
-        where: { gameweekID: scores.currentGameweek.gameweekID }, 
-        data: { whitescore: parseInt(scores.whitescore),
-            blackscore: parseInt(scores.blackscore)
-         },
-      });
+    const dataToUpdate = {whitescore: parseInt(scores.whitescore), blackscore: parseInt(scores.blackscore)};
+    const updatedGameweek = await updateGameweek(scores.currentGameweek.gameweekID, dataToUpdate);
    
-
     return NextResponse.json({ success: true, result: updatedGameweek});
   } 
   

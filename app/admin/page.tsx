@@ -1,14 +1,14 @@
 import { Player } from '@prisma/client';
 import ActivateGameweek from "./ActivateGameweek";
 import ManageGameweek from './ManageGameweek';
-import { prisma } from '../lib/prisma';
+import { fetchAllPlayers, fetchAllGameweeks, findGameweekStatsByGameweekID } from '../services/db.service';
 
 export const dynamic = 'force-dynamic';
 
 export default async function page(){
 
-    const allplayers = await prisma.player.findMany();
-    const gameweeks = await prisma.gameweek.findMany();
+    const players = await fetchAllPlayers();
+    const gameweeks = await fetchAllGameweeks();
 
     let lastGameweek: number = 0;
     let lastGameweekIsActive: boolean = false;
@@ -20,10 +20,10 @@ export default async function page(){
         lastGameweek = gameweeks.length - 1;
         lastGameweekIsActive = gameweeks[lastGameweek].isactive;
 
-        const gameweekStats = await prisma.gameweekstat.findMany({ where: { gameweekID: gameweeks[lastGameweek].gameweekID } })
+        const gameweekStats = await findGameweekStatsByGameweekID(gameweeks[lastGameweek].gameweekID);
+
         const gameweekPlayersIds = gameweekStats.map(gameweekStat => gameweekStat.playerID);
-    
-        gameweekPlayers = allplayers.filter(player => gameweekPlayersIds.includes(player.playerID));
+        gameweekPlayers = players.filter(player => gameweekPlayersIds.includes(player.playerID));
 
         const nominees = gameweekStats.filter(gameweekStats => gameweekStats.nominated === true);
         const nomineesIDs = [...new Set(nominees.map(nominee => nominee.playerID))]
@@ -39,7 +39,7 @@ export default async function page(){
                 lastGameweekIsActive ?  
                     <ManageGameweek gameweekPlayerList={gameweekPlayers} gameweek={gameweeks[lastGameweek]} nomineeList={nomineeList} haveNominatedPlayers={haveNominatedPlayers}></ManageGameweek>
                 :
-                    <ActivateGameweek playerList={allplayers} nextGameweek={gameweeks.length}></ActivateGameweek>
+                    <ActivateGameweek playerList={players} nextGameweek={gameweeks.length}></ActivateGameweek>
             }
         </div>
        

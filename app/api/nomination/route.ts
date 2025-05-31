@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Player } from "@prisma/client";
-import { prisma } from "@/app/lib/prisma";
+import { updateGameweekStat, updateGameweekStatsByPlayerIdAndGameweekID} from "@/app/services/db.service";
 
 export async function POST(req: Request) {
   try {
@@ -8,32 +8,16 @@ export async function POST(req: Request) {
 
     if(body.action === "adminSelectNominees"){
       const playerIds = body.payload.nominees.map((nominee: Player) => nominee.playerID);
-      const updatedRecords = await prisma.gameweekstat.updateMany({
-        where: {
-          playerID: { in: playerIds },
-          gameweekID: body.payload.gameweek.gameweekID
-        },
-        data: {
-          nominated: true,
-          points: 2
-        }
-    });
+      const gameweekIds: number[] = [body.payload.gameweek.gameweekID];
+      const dataToUpdate = {nominated: true, points: 2};
+      const updatedGameweekStats = await updateGameweekStatsByPlayerIdAndGameweekID(playerIds, gameweekIds, dataToUpdate);
     
-      return NextResponse.json({ success: true, message: updatedRecords});
+      return NextResponse.json({ success: true, message: updatedGameweekStats});
     }
 
     else if(body.action === "playerSelectNominee"){
-      
+      const updatedMotmNomination = await updateGameweekStat(body.payload.gameweekStatId,  {nomineeID: body.payload.nomineeId})
 
-      const updatedMotmNomination = await prisma.gameweekstat.update({
-        where: {
-          gameweekStatID: body.payload.gameweekStatId
-        },
-        data: {
-          nomineeID: body.payload.nomineeId
-        }
-      });
-    
       return NextResponse.json({ success: true, message: updatedMotmNomination});
     }
     

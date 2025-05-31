@@ -27,7 +27,7 @@ model Gameweekstat {
   gameweekStatID                           Int      @id @default(autoincrement()) @db.SmallInt
   gameweekID                               Int      @db.TinyInt
   playerID                                 Int      @db.TinyInt
-  team                                     Boolean?
+  team                                     Int?     @db.TinyInt
   goals_scored                             Int?     @db.TinyInt
   nomineeID                                Int?     @db.TinyInt
   points                                   Int?     @db.TinyInt

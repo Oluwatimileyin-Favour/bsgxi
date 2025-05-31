@@ -1,13 +1,13 @@
 import HomePage from "./home/HomePage";
-import { prisma } from "./lib/prisma";
+import {fetchAllGameweeks, fetchAllGameweekStats, fetchAllPlayers} from "./services/db.service";
 
 export const dynamic = 'force-dynamic';
 
 export default async function App() {
 
-  const players = await prisma.player.findMany();
-  const gameweeks = await prisma.gameweek.findMany();
-  const gameweekstats = await prisma.gameweekstat.findMany();
+  const players = await fetchAllPlayers(); 
+  const gameweeks = await fetchAllGameweeks();
+  const gameweekstats = await fetchAllGameweekStats();
 
   return (
     <HomePage players={players} gameweeks={gameweeks} gameweekstats={gameweekstats}></HomePage>

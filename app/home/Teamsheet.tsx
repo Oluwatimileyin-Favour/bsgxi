@@ -22,11 +22,11 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
     const motm: number = gameweek.motm ?? -1;
 
     const teamBlack: Gameweekstat[] = gameweekstats.filter(stat => {
-        return stat.team === false
+        return stat.team === 0
     }) ?? []
     
     const teamWhite: Gameweekstat[] = gameweekstats.filter(stat => {
-        return stat.team === true
+        return stat.team === 1
     }) ?? []
 
     const handleClick = (stats: Gameweekstat) => {
@@ -85,7 +85,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
         const nominator = players.find(player => player.code.trim() === playerCodeRef.current?.value.trim());
 
         if(nominator){
-            const gameweekstat = [...teamBlack, ...teamWhite].find(gameweekstat => gameweekstat.playerID === nominator.playerID);
+            const gameweekstat = gameweekstats.find(gameweekstat => gameweekstat.playerID === nominator.playerID);
 
             if(!gameweekstat){
                 alert("Player with entered code cannot vote");
