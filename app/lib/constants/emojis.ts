@@ -6,4 +6,7 @@ export default class Emojis {
     static readonly motmWinnerEmoji: string = "👑";
     static readonly goalEmoji:string = "⚽";
     static readonly seasonNotBegunEmoji: string = "⌛";
+    static readonly oldiesEmoji: string = '⬛';
+    static readonly newbiesEmoji: string = '⬜';
+    static readonly youngbloodEmoji: string = '🟥';
 }

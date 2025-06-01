@@ -16,6 +16,7 @@ model Gameweek {
   whitescore    Int?           @db.TinyInt
   blackscore    Int?           @db.TinyInt
   motm          Int?           @db.TinyInt
+  classicos     classicos[]
   players       Player?        @relation(fields: [motm], references: [playerID], onDelete: NoAction, map: "fk_gameweeks_players_motm")
   gameweekstats Gameweekstat[]
 
@@ -54,4 +55,15 @@ model Player {
   gameweekstats_gameweekstats_nomineeIDToplayers Gameweekstat[] @relation("gameweekstats_nomineeIDToplayers")
 
   @@map("players")
+}
+
+model classicos {
+  classicoID       Int      @id @default(autoincrement()) @db.TinyInt
+  gameweekID       Int      @db.TinyInt
+  newbies_goals    Int?     @db.TinyInt
+  youngblood_goals Int?     @db.TinyInt
+  oldies_goals     Int?     @db.TinyInt
+  gameweeks        Gameweek @relation(fields: [gameweekID], references: [gameweekID], onDelete: NoAction, map: "gameweekID")
+
+  @@index([gameweekID], map: "gameweekID_idx")
 }

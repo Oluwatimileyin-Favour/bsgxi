@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Gameweek, Gameweekstat, Player } from "@prisma/client";
 import Emojis from "../lib/constants/emojis";
+import { GameweekType } from "../lib/GameweekTypes";
 
 export default function Teamsheet({players, gameweek, gameweekstats}: {players: Player[], gameweek: Gameweek, gameweekstats: Gameweekstat[]}){
 
@@ -132,7 +133,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
     return (
         <div className="flex justify-center mt-5 w-[95%] lg:max-h-[320px] overflow-y-auto">
             {
-                !isPlayerSelected && gameweek.gametype.trim() === "Regular" &&
+                !isPlayerSelected && gameweek.gametype.trim() === GameweekType.Regular &&
                 <>
                     <div className="flex-1 text-center">
                         <h3 className="font-bold text-xl text-rose-900 dark:text-rose-500">Team Black {<span className="hidden md:inline">({gameweek.blackscore} {Emojis.goalEmoji})</span>}</h3>
@@ -164,7 +165,31 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
             }
 
             {
-                !isPlayerSelected && gameweek.gametype.trim() === "Threeteam" &&
+                !isPlayerSelected && gameweek.gametype.trim() === GameweekType.Classico &&
+                <>
+                    <div className="flex flex-col items-center">
+                        <h3 className="font-bold text-xl text-rose-900"> Classico Players</h3>
+                        <ul className="grid grid-cols-2 gap-4 mt-4">
+                            {gameweekstats.map((gameweekPlayer) => (
+                                <li key={gameweekPlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium text-center"
+                                    onClick={() => handleClick(gameweekPlayer)}
+                                >
+                                    {(gameweekPlayer.team === 0) && <span>{'⬛'}</span>}  
+                                    {(gameweekPlayer.team === 1) && <span>{'⬜'}</span>} 
+                                    {(gameweekPlayer.team === 2) && <span>{'🟥'}</span>} 
+                                    {(gameweekPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
+                                    {(gameweekPlayer.playerID != motm && gameweekPlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
+                                    {players.find(player => player.playerID === gameweekPlayer.playerID)?.firstname} 
+                                    {(gameweekPlayer.goals_scored ?? 0) > 0 && <span>- {gameweekPlayer.goals_scored} {Emojis.goalEmoji}</span>} 
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </>
+            }
+
+            {
+                !isPlayerSelected && gameweek.gametype.trim() === GameweekType.ThreeTeam &&
                 <>
                     <div className="flex flex-col items-center">
                         <h3 className="font-bold text-xl text-rose-900"> Gameweek Players</h3>

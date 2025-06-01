@@ -9,6 +9,7 @@ import { isDateInCurrentMonth } from "../util/dateService";
 import Slider from "../ui/Slider";
 import Leaderboard from "../ui/Leaderboard";
 import { LeaderboardConfig } from "../interfaces/LeaderboardConfig";
+import GameweekDetails from "./GameweekDetails";
 
 export default function HomePage({players, gameweeks, gameweekstats}: {players: Player[], gameweeks: Gameweek[], gameweekstats: Gameweekstat[]}) {
 
@@ -59,13 +60,7 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
                     
                     :
                         <div className="flex flex-col gap-2 justify-center items-center md:w-[550px] px-2 h-[100%]">
-                            <h2 className="font-bold text-3xl text-rose-900 dark:text-rose-500">Gameweek {selectedGameweekIdx + 1}</h2>
-                            {/* <Dropdown menuItems={gameweeks.map((_, index) => `Gameweek ${index + 1}`)} selectedItem={`Gameweek ${selectedGameweekIdx + 1}`} reactToSelection={updateSelectedGameweekIdx} displayTextSize="text-3xl"></Dropdown> */}
-                            <p className="font-semibold">{gameweeks[selectedGameweekIdx].date.toDateString()}</p>
-                            <p className="font-semibold">Gametype: {gameweeks[selectedGameweekIdx].gametype}</p>
-                            <p className="text-sm">{Emojis.motmWinnerEmoji} MOTM. {Emojis.shortlistedPlayerEmoji} Shortlisted for MOTM</p>
-                            <p className="text-sm">Click on shortlisted player to nominate for MOTM</p>
-                            <p className="text-sm">Click on self to record goals scored</p>
+                            <GameweekDetails gameweek={gameweeks[selectedGameweekIdx]}/>
                             <Teamsheet players={players} gameweek={gameweeks[selectedGameweekIdx]} gameweekstats = {selectedGameweekStats}></Teamsheet>
                             <Slider sliderItems={[...gameweeks].map((_, index) => `${index + 1}`)} selectedIdx={selectedGameweekIdx} reactToSelection={updateSelectedGameweekIdx}></Slider>
                         </div>  

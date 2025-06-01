@@ -175,7 +175,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
             teamInfo = {gameweekID: gameweekInfo.result.gameweekID, whiteteam: teamwhite, blackteam: teamblack};
         }
         else if(gameType === GameweekType.Classico){
-            teamInfo = {gameweekID: gameweekInfo.result.gameweekID, whiteteam: teamwhite, blackteam: teamblack, redTeam: teamRed};
+            teamInfo = {gameweekID: gameweekInfo.result.gameweekID, whiteteam: teamwhite, blackteam: teamblack, redteam: teamRed};
         }
         else{ //for threeteam games, put everyone on white team
             teamInfo = {gameweekID: gameweekInfo.result.gameweekID, whiteteam: gameweekPlayers, blackteam: []}
