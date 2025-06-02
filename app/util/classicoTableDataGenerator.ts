@@ -91,7 +91,7 @@ export function GenerateClassicoTableData(classicos: classicos[]): ClassicoTable
             oldiesStats.goalsFor += classico.oldies_goals ?? 0;
             
             if(classico.youngblood_goals != -1){
-                oldiesStats.goalsAgainst += classico.oldies_goals ?? 0;
+                oldiesStats.goalsAgainst += classico.youngblood_goals ?? 0;
 
                 if((classico.oldies_goals ?? 0) > (classico.youngblood_goals ?? 0)){
                     oldiesStats.pts += 3; 
@@ -117,7 +117,7 @@ export function GenerateClassicoTableData(classicos: classicos[]): ClassicoTable
                     oldiesStats.pts += 1; 
                     oldiesStats.draws += 1;
                 }
-                 else{
+                else{
                     oldiesStats.losses += 1;
                 }
             }
