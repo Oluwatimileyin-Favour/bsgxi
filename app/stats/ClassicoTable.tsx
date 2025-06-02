@@ -16,7 +16,6 @@ export default async function ClassicoTable() {
                 <thead className="">
                     <tr>
                         <th className="dark:bg-inherit border-2 px-4 py-2 text-left">Team</th>
-                        <th className="border-2 px-4 py-2 text-left">Games</th>
                         <th className="border-2 px-4 py-2 text-left">Pts</th>
                         <th className="border-2 px-4 py-2 text-left">GD</th>
                         <th className="border-2 px-4 py-2 text-left">W</th>
@@ -24,6 +23,7 @@ export default async function ClassicoTable() {
                         <th className="border-2 px-4 py-2 text-left">L</th>
                         <th className="border-2 px-4 py-2 text-left">GF</th>
                         <th className="border-2 px-4 py-2 text-left">GA</th>
+                        <th className="border-2 px-4 py-2 text-left">Games</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -38,7 +38,6 @@ function ClassicoTableRow({team} : {team: ClassicoTableRowData}) {
     return (
         <tr>
             <td className="dark:bg-inherit border-2 px-4 py-2">{team.name}</td>
-            <td className="border-2 px-4 py-2">{team.games}</td>
             <td className="border-2 px-4 py-2">{team.pts}</td>
             <td className="border-2 px-4 py-2">{team.goalsFor - team.goalsAgainst}</td>
             <td className="border-2 px-4 py-2">{team.wins}</td>
@@ -46,6 +45,7 @@ function ClassicoTableRow({team} : {team: ClassicoTableRowData}) {
             <td className="border-2 px-4 py-2">{team.losses}</td>
             <td className="border-2 px-4 py-2">{team.goalsFor}</td>
             <td className="border-2 px-4 py-2">{team.goalsAgainst}</td>
+            <td className="border-2 px-4 py-2">{team.games}</td>
         </tr>
     )
 }
