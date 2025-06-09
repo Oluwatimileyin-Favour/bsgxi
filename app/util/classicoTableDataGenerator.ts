@@ -6,9 +6,9 @@ export function GenerateClassicoTableData(classicos: classicos[]): ClassicoTable
     //TODO
     //can this be cleaned up
 
-    const newbiesStats: ClassicoTableRowData = {name: "Newbies", games: 0, pts: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0};
-    const youngbloodStats: ClassicoTableRowData = {name: "Youngblood", games: 0, pts: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0};
-    const oldiesStats: ClassicoTableRowData = {name: "Oldies", games: 0, pts: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0};
+    const newbiesStats: ClassicoTableRowData = {name: "Newbies", pts: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, games: 0};
+    const youngbloodStats: ClassicoTableRowData = {name: "Youngblood", pts: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, games: 0};
+    const oldiesStats: ClassicoTableRowData = {name: "Oldies", pts: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, games: 0};
 
     classicos.forEach((classico) => {
         if(classico.newbies_goals !== -1){
