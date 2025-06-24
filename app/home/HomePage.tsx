@@ -2,7 +2,7 @@
 
 import {Gameweek, Gameweekstat, Player } from "@prisma/client";
 import Teamsheet from "./Teamsheet";
-import Emojis from "../lib/constants/emojis";
+import Emojis from "../lib/emojis";
 import { useState } from "react";
 import { PlayerWithMonthPoint } from "../interfaces/PlayerWithMonthPoint";
 import { isDateInCurrentMonth } from "../util/dateService";
@@ -10,13 +10,14 @@ import Slider from "../ui/Slider";
 import Leaderboard from "../ui/Leaderboard";
 import { LeaderboardConfig } from "../interfaces/LeaderboardConfig";
 import GameweekDetails from "./GameweekDetails";
+import { LeaderBoardColours } from "../lib/TailwindColours";
 
 export default function HomePage({players, gameweeks, gameweekstats}: {players: Player[], gameweeks: Gameweek[], gameweekstats: Gameweekstat[]}) {
 
     const lastGameweekIdx: number = gameweeks.length - 1;
     const seasonHasBegun: boolean = lastGameweekIdx >= 0;
 
-    //gameweek selected by user on slider
+    //gameweek (index) selected by user on slider
     const [selectedGameweekIdx, updateSelectedGameweekIdx] = useState(lastGameweekIdx);
 
     let selectedGameweekStats: Gameweekstat[] = [];
@@ -42,8 +43,8 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
         return `${playerWithMonthPoints.player.firstname} - ${playerWithMonthPoints.monthPoints} pts`}
     );
     const potmLeaderboardConfig: LeaderboardConfig = {
-        lightModeColor: 'lightModeTextRose',
-        darkModeColor: 'darkModeBorderRose',
+        lightModeColor: LeaderBoardColours.lightModeTextRose,
+        darkModeColor: LeaderBoardColours.darkModeBorderRose,
         headerText: 'June POTM',
         displayEmoji: Emojis.potmLeaderBoardEmoji,
         sortedList: potmLeaderboardList
@@ -61,11 +62,11 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
                     :
                         <div className="flex flex-col gap-2 justify-center items-center md:w-[550px] px-2 h-[100%]">
                             <GameweekDetails gameweek={gameweeks[selectedGameweekIdx]}/>
-                            <Teamsheet players={players} gameweek={gameweeks[selectedGameweekIdx]} gameweekstats = {selectedGameweekStats}></Teamsheet>
-                            <Slider sliderItems={[...gameweeks].map((_, index) => `${index + 1}`)} selectedIdx={selectedGameweekIdx} reactToSelection={updateSelectedGameweekIdx}></Slider>
+                            <Teamsheet players={players} gameweek={gameweeks[selectedGameweekIdx]} gameweekstats = {selectedGameweekStats}/>
+                            <Slider sliderItems={[...gameweeks].map((_, index) => `${index + 1}`)} selectedIdx={selectedGameweekIdx} reactToSelection={updateSelectedGameweekIdx}/>
                         </div>  
                 }
-                <Leaderboard leaderboardConfig={potmLeaderboardConfig}></Leaderboard>
+                <Leaderboard leaderboardConfig={potmLeaderboardConfig}/>
             </div>
     )
 }

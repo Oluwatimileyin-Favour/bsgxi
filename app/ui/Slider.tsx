@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 
-
+// takes in a list of items to be displayed in a slider format
+// and the index of the cuurently selected item  to highlight it
+// and a function to react to the selection of an item
 export default function Slider({sliderItems, selectedIdx, reactToSelection}: {sliderItems: string[], selectedIdx: number, reactToSelection: (idx: number) => void}) {
 
     const numItemsPerSlide = 4

@@ -1,8 +1,9 @@
 import { LeaderboardConfig } from "../interfaces/LeaderboardConfig";
-import Emojis from "../lib/constants/emojis";
+import Emojis from "../lib/emojis";
 import Leaderboard from "../ui/Leaderboard";
 import { fetchAllPlayers } from "../services/db.service";
 import ClassicoTable from "./ClassicoTable";
+import { LeaderBoardColours } from "../lib/TailwindColours";
 
 export const dynamic = 'force-dynamic';
 
@@ -18,8 +19,8 @@ export default async function StatsPage(){
 
     const ballondOrLeaderboardList: string[] = sortedPlayersByPoints.map(player => `${player.firstname} - ${player.totalpoints} pts`);
     const ballondOrLeaderboardConfig: LeaderboardConfig = {
-        lightModeColor: "lightModeTextRose",
-        darkModeColor: "darkModeBorderRose",
+        lightModeColor: LeaderBoardColours.lightModeTextRose,
+        darkModeColor: LeaderBoardColours.darkModeBorderRose,
         headerText: "Road to Ballon d'Or",
         displayEmoji: Emojis.ballondorBoardEmoji,
         sortedList: ballondOrLeaderboardList
@@ -27,8 +28,8 @@ export default async function StatsPage(){
 
     const goldenBootLeaderboardList: string[] = sortedPlayersByGoals.map(player => `${player.firstname} - ${player.totalgoals} ${Emojis.goalEmoji}`);
     const goldenBootLeaderboardConfig: LeaderboardConfig = {
-        lightModeColor: "lightModeTextSky",
-        darkModeColor: "darkModeBorderSky",
+        lightModeColor: LeaderBoardColours.lightModeTextSky,
+        darkModeColor: LeaderBoardColours.darkModeBorderSky,
         headerText: "Road to Golden Boot",
         displayEmoji: Emojis.goldenBootBoardEmoji,
         sortedList: goldenBootLeaderboardList

@@ -1,5 +1,5 @@
 import { Gameweek } from "@prisma/client";
-import Emojis from "../lib/constants/emojis";
+import Emojis from "../lib/emojis";
 import { GameweekType } from "../lib/GameweekTypes";
 
 

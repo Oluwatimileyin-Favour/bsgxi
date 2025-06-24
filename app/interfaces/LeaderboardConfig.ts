@@ -1,10 +1,8 @@
-import { LeaderBoardColours } from "../lib/TailwindColours";
-
-type LeaderBoardColourKey = keyof typeof LeaderBoardColours;
+// type LeaderBoardColourKey = keyof typeof LeaderBoardColours;
 
 export interface LeaderboardConfig {
-    lightModeColor: LeaderBoardColourKey,
-    darkModeColor: LeaderBoardColourKey,
+    lightModeColor: string,
+    darkModeColor: string,
     headerText: string,
     displayEmoji?: string,
     sortedList: string[]
