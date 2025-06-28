@@ -1,30 +1,22 @@
 'use client'
 
-import { useState, useRef, RefObject } from "react";
+import { useState } from "react";
 import { Gameweek, Gameweekstat, Player } from "@prisma/client";
 import Emojis from "../lib/emojis";
 import { GameweekType } from "../lib/GameweekTypes";
+import UpdateGoalsForm from "./UpdateGoalsForm";
+import UpdateMotmNominationForm from "./UpdateMotmNominationForm";
 
 export default function Teamsheet({players, gameweek, gameweekstats}: {players: Player[], gameweek: Gameweek, gameweekstats: Gameweekstat[]}){
 
     const [selectedPlayerStats, updateSelectedPlayerStats] = useState<Gameweekstat>(gameweekstats[0]);
-    const [playerIsClicked, updatePlayerSelectionStatus] = useState<boolean>(false);
+    const [playerIsSelected, updatePlayerSelectionStatus] = useState<boolean>(false);
     const [nominateForMotmClicked, updateNominateForMotmClickedStatus] = useState<boolean>(false);
-    const [enterGoals, updateEnterGoalsStatus] = useState<boolean>(false);
-
-    const goalsScoredRef = useRef<HTMLInputElement>(null);
-    const playerCodeRef = useRef<HTMLInputElement>(null);
-    
-    const updateGoalsRef = useRef<HTMLButtonElement>(null);
-    const handleNominationRef = useRef<HTMLButtonElement>(null);
+    const [enterGoalsClicked, updateEnterGoalsClickedStatus] = useState<boolean>(false);
     
     const selectedPlayer = players.find(player => player.playerID === selectedPlayerStats.playerID);
 
-    //person who is nominating a player for MOTM and their gameweek stats
-    const nominator = players.find(player => player.code.trim() === playerCodeRef.current?.value.trim());
-    const nominatorGameweekstat = gameweekstats.find(stat => stat.playerID === nominator?.playerID);
-
-    const motm: number = gameweek.motm ?? -1;
+    const motmPlayerID: number = gameweek.motm ?? -1;
 
     const teamBlackStats: Gameweekstat[] = gameweekstats.filter(stat => {
         return stat.team === 0
@@ -37,7 +29,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
     const onSelectPlayer = (playerStats: Gameweekstat) => {
         if(gameweek.isactive){
             updateSelectedPlayerStats(playerStats)
-            updatePlayerSelectionStatus(!playerIsClicked)
+            updatePlayerSelectionStatus(!playerIsSelected)
         }
        else {
             alert("Gameweek has been closed")
@@ -45,85 +37,78 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
     }
 
     const resetState = () => {
-        updatePlayerSelectionStatus(false)
-        updateEnterGoalsStatus(false)
-        updateNominateForMotmClickedStatus(false)
+        updatePlayerSelectionStatus(false);
+        updateEnterGoalsClickedStatus(false);
+        updateNominateForMotmClickedStatus(false);
     }
 
     return (
         <div className="flex justify-center mt-5 w-[95%] lg:max-h-[320px] overflow-y-auto">
             {/* Would show only one of the blocks below depending on the condition met */}
-            
+
             {
-                !playerIsClicked && gameweek.gametype.trim() === GameweekType.Regular &&
+                !playerIsSelected && gameweek.gametype.trim() === GameweekType.Regular &&
 
                 <RegularGameInterface
                     teamBlackStats={teamBlackStats}
                     teamWhiteStats={teamWhiteStats}
                     gameweek={gameweek}
                     players={players}
-                    motm={motm}
+                    motm={motmPlayerID}
                     onSelectPlayer={onSelectPlayer}
                 />
             }
 
             {
-                !playerIsClicked && gameweek.gametype.trim() === GameweekType.Classico &&
+                !playerIsSelected && gameweek.gametype.trim() === GameweekType.Classico &&
 
                 <ClassicoGameInterface
                     gameweekstats={gameweekstats}
                     players={players}
-                    motm={motm}
+                    motm={motmPlayerID}
                     onSelectPlayer={onSelectPlayer}
                 />
             }
 
             {
-                !playerIsClicked && gameweek.gametype.trim() === GameweekType.ThreeTeam &&
+                !playerIsSelected && gameweek.gametype.trim() === GameweekType.ThreeTeam &&
 
                 <ThreeTeamGameInterface
                     gameweekstats={gameweekstats}
                     players={players}
-                    motm={motm}
+                    motm={motmPlayerID}
                     onSelectPlayer={onSelectPlayer}
                 />
             }
             
             {
-                playerIsClicked && selectedPlayerStats.nominated && !nominateForMotmClicked && !enterGoals &&
+                playerIsSelected && selectedPlayerStats.nominated && !nominateForMotmClicked && !enterGoalsClicked &&
 
                 <ChooseActionMenu
                     updateNominateForMotmClickedStatus={updateNominateForMotmClickedStatus}
-                    updateEnterGoalsStatus={updateEnterGoalsStatus}
+                    updateEnterGoalsStatus={updateEnterGoalsClickedStatus}
                     updatePlayerSelectionStatus={updatePlayerSelectionStatus}
-                    playerIsClicked={playerIsClicked}
+                    playerIsSelected={playerIsSelected}
                 />
             }
 
             {
-                playerIsClicked && (enterGoals || !selectedPlayerStats.nominated) &&
+                playerIsSelected && (enterGoalsClicked || !selectedPlayerStats.nominated) &&
 
                 <UpdateGoalsForm
-                    goalsScoredRef={goalsScoredRef}
-                    playerCodeRef={playerCodeRef}
-                    updateGoalsRef={updateGoalsRef}
-                    resetState={resetState}
                     selectedPlayer={selectedPlayer}
                     selectedPlayerStats={selectedPlayerStats}
+                    resetState={resetState}
                 />
-
             }
 
             { 
-                playerIsClicked && nominateForMotmClicked &&
+                playerIsSelected && nominateForMotmClicked &&
 
-               <UpdateMotmNominationForm
-                    handleNominationRef={handleNominationRef}
-                    playerCodeRef={playerCodeRef}
+                <UpdateMotmNominationForm
                     selectedPlayer={selectedPlayer}
-                    resetState={resetState}
-                    nominator={nominator}
-                    nominatorGameweekstat={nominatorGameweekstat}
+                    gameweekID={gameweek.gameweekID}  
+                    resetState={resetState} 
                 />
             }
         </div>
@@ -216,11 +201,11 @@ function ThreeTeamGameInterface ({gameweekstats, players, motm, onSelectPlayer}:
 }
 
 
-function ChooseActionMenu({updateNominateForMotmClickedStatus, updateEnterGoalsStatus, updatePlayerSelectionStatus, playerIsClicked}: {
+function ChooseActionMenu({updateNominateForMotmClickedStatus, updateEnterGoalsStatus, updatePlayerSelectionStatus, playerIsSelected}: {
     updateNominateForMotmClickedStatus: (status: boolean) => void,
     updateEnterGoalsStatus: (status: boolean) => void,
     updatePlayerSelectionStatus: (status: boolean) => void,
-    playerIsClicked: boolean
+    playerIsSelected: boolean
 }) {
 
     return (
@@ -238,216 +223,10 @@ function ChooseActionMenu({updateNominateForMotmClickedStatus, updateEnterGoalsS
             </button>
             <button
                 className="w-full my-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-                onClick={() => updatePlayerSelectionStatus(!playerIsClicked)}
+                onClick={() => updatePlayerSelectionStatus(!playerIsSelected)}
             >
                 Cancel
             </button>
         </div>
     )
-}
-
-
-function UpdateGoalsForm({goalsScoredRef, playerCodeRef, updateGoalsRef, resetState, selectedPlayer, selectedPlayerStats}: 
-    {
-    goalsScoredRef: RefObject<HTMLInputElement | null>,
-    playerCodeRef: RefObject<HTMLInputElement | null>,
-    updateGoalsRef: RefObject<HTMLButtonElement | null>,
-    resetState: () => void,
-    selectedPlayer: Player | undefined,
-    selectedPlayerStats: Gameweekstat
-}) {
-    return (
-        <form
-            onSubmit={e => updateGoals(e, updateGoalsRef, goalsScoredRef, playerCodeRef, selectedPlayerStats, selectedPlayer, resetState)}
-            className="max-w-sm mx-auto dark:border-sky-400 dark:border-2 shadow-md rounded-lg p-6"
-        >
-            <div className="mb-4 space-y-2">
-                <label
-                    htmlFor="textInput"
-                    className="block text-lg font-bold text-red-700 dark:text-sky-400 mb-2"
-                >
-                {selectedPlayer?.firstname}
-                </label>
-                <label
-                    htmlFor="textInput"
-                    className="block text-sm font-medium text-gray-700 dark:text-sky-700 mb-2"
-                >
-                how many goals did you score?
-                </label>
-                <input
-                    type='number'
-                    id="textInput"
-                    ref={goalsScoredRef}
-                    name="textInput"
-                    placeholder="goals"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <input
-                    type="text"
-                    id="textInput"
-                    ref={playerCodeRef}
-                    name="textInput"
-                    placeholder="your code"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-            </div>
-            <button
-                type="submit"
-                className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                ref={updateGoalsRef}
-            >
-                Save
-            </button>
-            <button
-                className="w-full my-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-                onClick={resetState}
-            >
-                Cancel
-            </button>
-        </form>
-    )
-}
-
-
-function UpdateMotmNominationForm({selectedPlayer, handleNominationRef, playerCodeRef, resetState, nominator, nominatorGameweekstat} : {
-    selectedPlayer: Player | undefined,
-    handleNominationRef: RefObject<HTMLButtonElement | null>,
-    playerCodeRef: RefObject<HTMLInputElement | null>,
-    resetState: () => void,
-    nominator: Player | undefined,
-    nominatorGameweekstat: Gameweekstat | undefined
-}) {
-    return (
-        <form
-            onSubmit={e => updateMotmNomination(e, handleNominationRef, selectedPlayer, resetState, nominator, nominatorGameweekstat)}
-            className="max-w-sm mx-auto shadow-md rounded-lg p-6 dark:border-sky-400 dark:border-2"
-        >
-            <div className="mb-4">
-                <label
-                htmlFor="textInput"
-                className="block text-lg font-bold text-red-700 dark:text-sky-400 mb-2"
-                >
-                Are you sure you want to nominate {selectedPlayer?.firstname} for MOTM?
-                </label>
-                <input
-                type="text"
-                id="textInput"
-                ref={playerCodeRef}
-                name="textInput"
-                placeholder="your code"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-            </div>
-            <button
-                type="submit"
-                className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                ref={handleNominationRef}
-            >
-                Save
-            </button>
-            <button
-                className="w-full my-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-                onClick={resetState}
-            >
-                Cancel
-            </button>
-        </form>
-    )
-}
-
-
-async function updateGoals(
-    e: React.FormEvent<HTMLFormElement>,
-    updateGoalsRef: RefObject<HTMLButtonElement | null>,
-    goalsScoredRef: RefObject<HTMLInputElement | null>,
-    playerCodeRef: RefObject<HTMLInputElement | null>,
-    selectedPlayerStats: Gameweekstat,
-    selectedPlayer: Player | undefined,
-    resetState: () => void
-) {
-    e.preventDefault();
-
-    if(updateGoalsRef.current){
-        updateGoalsRef.current.style.display = 'none';  //immediately remove button so user doesn't click twice
-    }
-
-    if(selectedPlayer?.code.trim() === playerCodeRef.current?.value.trim()){
-        const goals = {gameweekStatId: selectedPlayerStats.gameweekStatID, goalsScored: goalsScoredRef.current?.value};
-        try {
-            const response = await fetch("/api/goals", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({goals}),
-            });
-        
-            const data = await response.json();
-            if (data.success) {
-                alert("Goals updated successfully!");  
-                window.location.reload();
-            } 
-            else {
-                alert("Error: " + data.error);
-            }
-        } 
-        catch (error) {
-            alert("Error: " + error);
-        }
-    }
-    else {
-        alert("Incorrect code. Please try again.");
-    }
-
-    resetState();
-}
-
-
-async function updateMotmNomination(e: React.FormEvent<HTMLFormElement>,
-    handleNominationRef: RefObject<HTMLButtonElement | null>,
-    nominatedPlayer: Player | undefined,
-    resetState: () => void,
-    nominator: Player | undefined,
-    nominatorGameweekstat: Gameweekstat | undefined,
-){
-
-    e.preventDefault();
-
-    if(handleNominationRef.current){
-        handleNominationRef.current.style.display = 'none';  //immediately remove button so user doesn't click twice
-    }
-
-    if(nominator){
-        if(!nominatorGameweekstat){
-            alert("Player with entered code cannot vote");
-            return;
-        }
-
-        const nominationPair = {gameweekStatId: nominatorGameweekstat?.gameweekStatID, nomineeId: nominatedPlayer?.playerID};
-
-        const body = {action: "playerSelectNominee", payload: nominationPair}; 
-        
-        try {
-            const response = await fetch("/api/nomination", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({body}),
-            });
-        
-            const data = await response.json();
-            if (data.success) {
-                alert("Nomination saved successfully!");  
-            } 
-            else {
-                alert("Error: " + data.error);
-            }
-        } 
-        catch (error) {
-            alert("Error: " + error);
-        }
-    }
-
-    else {
-        alert("Incorrect code")
-    }
-
-    resetState();
 }

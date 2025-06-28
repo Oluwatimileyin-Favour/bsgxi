@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Player } from "@prisma/client";
 import { updateGameweekStat, updateGameweekStatsByPlayerIdAndGameweekID} from "@/app/services/db.service";
+import { prisma } from "@/app/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -20,7 +21,25 @@ export async function POST(req: Request) {
 
       return NextResponse.json({ success: true, message: updatedMotmNomination});
     }
-    
+
+    else if(body.action === "getNominatorAndTheirGameweekStat"){
+      const { playerCode, gameweekID } = body.payload;
+
+      const player = await prisma.player.findUnique({where:{ code: playerCode }});
+      const playerGameweekstat = await prisma.gameweekstat.findFirst({
+        where: {
+          playerID: player?.playerID,
+          gameweekID: gameweekID
+        }
+      })
+
+      if (player) {
+        return NextResponse.json({success: true, result: {player, playerGameweekstat}});
+      }
+      else {
+        return NextResponse.json({success: false, error: "Player not found"}, { status: 404 }); 
+      }
+    }
   } 
   
   catch (error) {
