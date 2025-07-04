@@ -82,7 +82,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
             }
             
             {
-                playerIsSelected && selectedPlayerStats.nominated && !nominateForMotmClicked && !enterGoalsClicked &&
+                playerIsSelected && selectedPlayerStats.shortlisted && !nominateForMotmClicked && !enterGoalsClicked &&
 
                 <ChooseActionMenu
                     updateNominateForMotmClickedStatus={updateNominateForMotmClickedStatus}
@@ -93,7 +93,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
             }
 
             {
-                playerIsSelected && (enterGoalsClicked || !selectedPlayerStats.nominated) &&
+                playerIsSelected && (enterGoalsClicked || !selectedPlayerStats.shortlisted) &&
 
                 <UpdateGoalsForm
                     selectedPlayer={selectedPlayer}
@@ -128,7 +128,7 @@ function RegularGameInterface ({teamBlackStats, teamWhiteStats, gameweek, player
                             onClick={() => onSelectPlayer(teamBlackPlayerStat)}
                         >
                             {(teamBlackPlayerStat.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
-                            {(teamBlackPlayerStat.playerID != motm && teamBlackPlayerStat.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
+                            {(teamBlackPlayerStat.playerID != motm && teamBlackPlayerStat.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
                             {players.find(player => player.playerID === teamBlackPlayerStat.playerID)?.firstname} 
                             {(teamBlackPlayerStat.goals_scored ?? 0) > 0 && <span>- {teamBlackPlayerStat.goals_scored} {Emojis.goalEmoji}</span>} 
                         </li>
@@ -144,7 +144,7 @@ function RegularGameInterface ({teamBlackStats, teamWhiteStats, gameweek, player
                             onClick={() => onSelectPlayer(teamWhiteStatsPlayer)}
                         >
                             {(teamWhiteStatsPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
-                            {(teamWhiteStatsPlayer.playerID != motm && teamWhiteStatsPlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
+                            {(teamWhiteStatsPlayer.playerID != motm && teamWhiteStatsPlayer.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
                             {players.find(player => player.playerID === teamWhiteStatsPlayer.playerID)?.firstname} 
                             {(teamWhiteStatsPlayer.goals_scored ?? 0) > 0 && <span>- {teamWhiteStatsPlayer.goals_scored} {Emojis.goalEmoji}</span>}
                         </li>
@@ -169,7 +169,7 @@ function ClassicoGameInterface ({gameweekstats, players, motm, onSelectPlayer}: 
                         {(gameweekPlayer.team === 1) && <span>{'⬜'}</span>} 
                         {(gameweekPlayer.team === 2) && <span>{'🟥'}</span>} 
                         {(gameweekPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
-                        {(gameweekPlayer.playerID != motm && gameweekPlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
+                        {(gameweekPlayer.playerID != motm && gameweekPlayer.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
                         {players.find(player => player.playerID === gameweekPlayer.playerID)?.firstname} 
                         {(gameweekPlayer.goals_scored ?? 0) > 0 && <span>- {gameweekPlayer.goals_scored} {Emojis.goalEmoji}</span>} 
                     </li>
@@ -190,7 +190,7 @@ function ThreeTeamGameInterface ({gameweekstats, players, motm, onSelectPlayer}:
                         onClick={() => onSelectPlayer(gameweekPlayer)}
                     >
                         {(gameweekPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
-                        {(gameweekPlayer.playerID != motm && gameweekPlayer.nominated) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
+                        {(gameweekPlayer.playerID != motm && gameweekPlayer.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
                         {players.find(player => player.playerID === gameweekPlayer.playerID)?.firstname} 
                         {(gameweekPlayer.goals_scored ?? 0) > 0 && <span>- {gameweekPlayer.goals_scored} {Emojis.goalEmoji}</span>} 
                     </li>

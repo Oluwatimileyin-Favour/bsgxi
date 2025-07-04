@@ -25,7 +25,7 @@ export default async function page(){
         const gameweekPlayersIds = gameweekStats.map(gameweekStat => gameweekStat.playerID);
         gameweekPlayers = players.filter(player => gameweekPlayersIds.includes(player.playerID));
 
-        const nominees = gameweekStats.filter(gameweekStats => gameweekStats.nominated === true);
+        const nominees = gameweekStats.filter(gameweekStats => gameweekStats.shortlisted === true);
         const nomineesIDs = [...new Set(nominees.map(nominee => nominee.playerID))]
         nomineeList = gameweekPlayers.filter(player => nomineesIDs.includes(player.playerID));
         if(nomineeList.length > 0){

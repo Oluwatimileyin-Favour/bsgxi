@@ -1,11 +1,11 @@
 import { ClassicoTableRowData } from "../interfaces/classicoTableRowData";
-import { prisma } from "../lib/prisma"
 import { GenerateClassicoTableData } from "../util/classicoTableDataGenerator";
+import { fetchAllClassicos } from "../services/db.service";
 
 
 export default async function ClassicoTable() {
 
-    const classicos = await prisma.classicos.findMany();
+    const classicos = await fetchAllClassicos();
     
     const teams = GenerateClassicoTableData(classicos);
 

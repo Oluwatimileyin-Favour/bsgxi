@@ -32,7 +32,7 @@ model Gameweekstat {
   goals_scored                             Int?     @db.TinyInt
   nomineeID                                Int?     @db.TinyInt
   points                                   Int?     @db.TinyInt
-  nominated                                Boolean?
+  shortlisted                              Boolean?
   gameweeks                                Gameweek @relation(fields: [gameweekID], references: [gameweekID], onDelete: NoAction, onUpdate: NoAction, map: "fk_gameweekstats_gameweeks_gameweekID")
   players_gameweekstats_playerIDToplayers  Player   @relation("gameweekstats_playerIDToplayers", fields: [playerID], references: [playerID], onDelete: NoAction, map: "fk_gameweekstats_players")
   players_gameweekstats_nomineeIDToplayers Player?  @relation("gameweekstats_nomineeIDToplayers", fields: [nomineeID], references: [playerID], onDelete: NoAction, map: "fk_gameweekstats_players_nomineeID")

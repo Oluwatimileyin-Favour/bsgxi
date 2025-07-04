@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     if(body.action === "adminSelectNominees"){
       const playerIds = body.payload.nominees.map((nominee: Player) => nominee.playerID);
       const gameweekIds: number[] = [body.payload.gameweek.gameweekID];
-      const dataToUpdate = {nominated: true, points: 2};
+      const dataToUpdate = {shortlisted: true, points: 2};
       const updatedGameweekStats = await updateGameweekStatsByPlayerIdAndGameweekID(playerIds, gameweekIds, dataToUpdate);
     
       return NextResponse.json({ success: true, message: updatedGameweekStats});

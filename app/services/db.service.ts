@@ -13,6 +13,10 @@ export async function fetchAllGameweekStats() {
     return await prisma.gameweekstat.findMany();
 }
 
+export async function fetchAllClassicos() {
+    return await prisma.classicos.findMany();
+}
+
 export async function findGameweekStatsByGameweekID(gameweekID: number) {
     return await prisma.gameweekstat.findMany({ where: { gameweekID: gameweekID } })
 }
