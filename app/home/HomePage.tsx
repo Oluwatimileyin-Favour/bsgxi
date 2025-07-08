@@ -45,7 +45,7 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
     const potmLeaderboardConfig: LeaderboardConfig = {
         lightModeColor: LeaderBoardColours.lightModeTextRose,
         darkModeColor: LeaderBoardColours.darkModeBorderRose,
-        headerText: 'June POTM',
+        headerText: 'July POTM',
         displayEmoji: Emojis.potmLeaderBoardEmoji,
         sortedList: potmLeaderboardList
     };
