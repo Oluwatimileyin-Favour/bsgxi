@@ -1,11 +1,14 @@
 'use client'
 
 import { useState, useRef } from "react"
-import generateCode from "../util/generateCode";
+import generateAdminCode from "../util/generateCode";
 import { Player, Gameweek } from "@prisma/client";
 
-export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeList, haveNominatedPlayers}: {gameweekPlayerList: Player[], gameweek: Gameweek, nomineeList: Player[], haveNominatedPlayers: boolean}){
+export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeList, haveShortlistedPlayers}: {gameweekPlayerList: Player[], gameweek: Gameweek, nomineeList: Player[], haveShortlistedPlayers: boolean}){
 
+    //TODO
+    // organise sections into own components like activategameweek
+    // handle db interactions with admin service
     const [nominees, updateNominees] = useState(nomineeList)
     const [gameweekPlayers, updateGameweekPlayers] = useState(gameweekPlayerList);
     const [closeGameweek, updateCloseGameweekStatus] = useState(false);
@@ -16,10 +19,10 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
     const adminCodeRef = useRef<HTMLInputElement>(null);
     const closeGameweekRef = useRef<HTMLButtonElement>(null);
 
-    const adminCode =  generateCode();
+    const adminCode =  generateAdminCode();
 
     const onclickplayer = (player: Player) => {
-        if(!haveNominatedPlayers){
+        if(!haveShortlistedPlayers){
             const nomineesUpdate = [...nominees, player];
             const gameweekPlayersUpdate = gameweekPlayers.filter(gameweekPlayer => gameweekPlayer.playerID != player.playerID);
     
@@ -29,7 +32,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
     }
 
     const onclickChosenPlayer = (nominee: Player) => {
-        if(!haveNominatedPlayers){
+        if(!haveShortlistedPlayers){
             const nomineesUpdate = nominees.filter(player => player.playerID != nominee.playerID);
             const gameweekPlayersUpdate = [...gameweekPlayers, nominee];
     
@@ -147,7 +150,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                 !closeGameweek && !nominatePlayers &&
                 <>
                     {
-                        !haveNominatedPlayers &&
+                        !haveShortlistedPlayers &&
                         <div className="h-[500px] overflow-y-auto bg-gray-100 dark:border-red-500 dark:border-4 dark:bg-inherit p-4 rounded-lg shadow-md">
                             <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">Click on player to nominate for MOTM</h3>
                             <ul className="space-y-2">
@@ -170,7 +173,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                                 </li>
                             ))}
                         </ul>
-                            { !haveNominatedPlayers &&
+                            { !haveShortlistedPlayers &&
                                 <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-10 w-[100px]"
                                     onClick={() => updateNominatePlayersStatus(true)}
                                 >

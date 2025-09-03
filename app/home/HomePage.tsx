@@ -5,12 +5,12 @@ import Teamsheet from "./Teamsheet";
 import Emojis from "../lib/emojis";
 import { useState } from "react";
 import { PlayerWithMonthPoint } from "../interfaces/PlayerWithMonthPoint";
-import { isDateInCurrentMonth } from "../util/dateService";
 import Slider from "../ui/Slider";
 import Leaderboard from "../ui/Leaderboard";
 import { LeaderboardConfig } from "../interfaces/LeaderboardConfig";
 import GameweekDetails from "./GameweekDetails";
 import { LeaderBoardColours } from "../lib/TailwindColours";
+import { getCurrentMonth, isDateInCurrentMonth } from "../services/date.service";
 
 export default function HomePage({players, gameweeks, gameweekstats}: {players: Player[], gameweeks: Gameweek[], gameweekstats: Gameweekstat[]}) {
 
@@ -45,7 +45,7 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
     const potmLeaderboardConfig: LeaderboardConfig = {
         lightModeColor: LeaderBoardColours.lightModeTextRose,
         darkModeColor: LeaderBoardColours.darkModeBorderRose,
-        headerText: 'July POTM',
+        headerText: `${getCurrentMonth()} POTM`,
         displayEmoji: Emojis.potmLeaderBoardEmoji,
         sortedList: potmLeaderboardList
     };

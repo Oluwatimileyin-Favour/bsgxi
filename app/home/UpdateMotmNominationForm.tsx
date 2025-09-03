@@ -7,6 +7,9 @@ export default function UpdateMotmNominationForm({selectedPlayer, gameweekID, re
     resetState: () => void,
 }) {
 
+    //TODO
+    // CONSIDER MOVING FUNCTION FOR DB INTERACTION TO A SERVICE
+
     const playerCodeRef = useRef<HTMLInputElement>(null);
     const handleNominationRef = useRef<HTMLButtonElement>(null);
 

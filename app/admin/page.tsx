@@ -14,7 +14,7 @@ export default async function page(){
     let lastGameweekIsActive: boolean = false;
     let gameweekPlayers: Player[] = [];
     let nomineeList: Player[] = [];
-    let haveNominatedPlayers: boolean = false;
+    let haveShortlistedPlayers: boolean = false;
     
     if(gameweeks.length > 0){
         lastGameweek = gameweeks.length - 1;
@@ -29,7 +29,7 @@ export default async function page(){
         const nomineesIDs = [...new Set(nominees.map(nominee => nominee.playerID))]
         nomineeList = gameweekPlayers.filter(player => nomineesIDs.includes(player.playerID));
         if(nomineeList.length > 0){
-            haveNominatedPlayers = true;
+            haveShortlistedPlayers = true;
         }
     }
 
@@ -37,9 +37,9 @@ export default async function page(){
         <div className='flex justify-center items-center min-h-[100%]'>
             {
                 lastGameweekIsActive ?  
-                    <ManageGameweek gameweekPlayerList={gameweekPlayers} gameweek={gameweeks[lastGameweek]} nomineeList={nomineeList} haveNominatedPlayers={haveNominatedPlayers}></ManageGameweek>
+                    <ManageGameweek gameweekPlayerList={gameweekPlayers} gameweek={gameweeks[lastGameweek]} nomineeList={nomineeList} haveShortlistedPlayers={haveShortlistedPlayers}/>
                 :
-                    <ActivateGameweek playerList={players} nextGameweek={gameweeks.length}></ActivateGameweek>
+                    <ActivateGameweek playerList={players} nextGameweek={gameweeks.length}/>
             }
         </div>
        

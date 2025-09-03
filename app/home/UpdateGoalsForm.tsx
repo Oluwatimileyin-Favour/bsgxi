@@ -1,5 +1,6 @@
 import { Player, Gameweekstat } from "@prisma/client";
 import { RefObject, useRef } from "react";
+import generateAdminCode from "../util/generateCode";
 
 
 export default function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, resetState}: 
@@ -8,6 +9,9 @@ export default function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, re
     selectedPlayerStats: Gameweekstat,
     resetState: () => void,
 }) {
+
+    // CONSIDER MOVING FUNCTION FOR DB INTERACTION TO A SERVICE
+    // MIGHT USE ONE UNIFIED SERVICE FOR ALL DB INTERACTIONS
 
     const goalsScoredRef = useRef<HTMLInputElement>(null);
     const playerCodeRef = useRef<HTMLInputElement>(null);
@@ -81,7 +85,7 @@ async function updateGoals(
         updateGoalsRef.current.style.display = 'none';  //immediately remove button so user doesn't click twice
     }
 
-    if(selectedPlayer?.code.trim() === playerCodeRef.current?.value.trim()){
+    if(selectedPlayer?.code.trim() === playerCodeRef.current?.value.trim() || playerCodeRef.current?.value.trim() === generateAdminCode()){
         const goals = {gameweekStatId: selectedPlayerStats.gameweekStatID, goalsScored: goalsScoredRef.current?.value};
         try {
             const response = await fetch("/api/goals", {
