@@ -1,5 +1,5 @@
 export default class Emojis {
-    static readonly potmLeaderBoardEmoji:string = "🤩"; 
+    static readonly potmLeaderBoardEmoji:string = "🍁"; 
     static readonly goldenBootBoardEmoji:string = "";
     static readonly ballondorBoardEmoji: string = "🏆";
     static readonly shortlistedPlayerEmoji: string = "🔥"; 

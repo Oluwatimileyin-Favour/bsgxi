@@ -1,5 +1,3 @@
-// type LeaderBoardColourKey = keyof typeof LeaderBoardColours;
-
 export interface LeaderboardConfig {
     lightModeColor: string,
     darkModeColor: string,

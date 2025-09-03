@@ -1,16 +1,16 @@
 'use client'
 
-import {Gameweek, Gameweekstat, Player } from "@prisma/client";
-import Teamsheet from "./Teamsheet";
-import Emojis from "../lib/emojis";
+import { Gameweek, Gameweekstat, Player } from "@prisma/client";
 import { useState } from "react";
-import { PlayerWithMonthPoint } from "../interfaces/PlayerWithMonthPoint";
-import Slider from "../ui/Slider";
-import Leaderboard from "../ui/Leaderboard";
 import { LeaderboardConfig } from "../interfaces/LeaderboardConfig";
-import GameweekDetails from "./GameweekDetails";
+import { PlayerWithMonthPoint } from "../interfaces/PlayerWithMonthPoint";
+import Emojis from "../lib/emojis";
 import { LeaderBoardColours } from "../lib/TailwindColours";
-import { getCurrentMonth, isDateInCurrentMonth } from "../services/date.service";
+import { getCurrentMonth, getMonthName, isDateInMonth } from "../services/date.service";
+import PotmLeaderboard from "../ui/PotmLeaderboard";
+import Slider from "../ui/Slider";
+import GameweekDetails from "./GameweekDetails";
+import Teamsheet from "./Teamsheet";
 
 export default function HomePage({players, gameweeks, gameweekstats}: {players: Player[], gameweeks: Gameweek[], gameweekstats: Gameweekstat[]}) {
 
@@ -19,19 +19,32 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
 
     //gameweek (index) selected by user on slider
     const [selectedGameweekIdx, updateSelectedGameweekIdx] = useState(lastGameweekIdx);
+    const [potmLeaderboardMonth, setPotmLeaderboardMonth] = useState<number>(getCurrentMonth());
+
+    function updatePotmTableData(monthChange: number) {
+        // don't allow going past current month
+        setPotmLeaderboardMonth(prevMonth => {
+            const currentMonth = getCurrentMonth();
+            const newMonth = prevMonth + monthChange;
+            if (newMonth < 0) return 11;
+            if (newMonth > 11) return 0;
+            if (newMonth > currentMonth) return currentMonth;
+            return newMonth;
+        });
+    }
 
     let selectedGameweekStats: Gameweekstat[] = [];
     if (seasonHasBegun) selectedGameweekStats = gameweekstats.filter(gameweekstat => gameweekstat.gameweekID === selectedGameweekIdx);
 
-    const currentMonthGameweeks: Gameweek[] = gameweeks.filter((gameweek) => (
-        isDateInCurrentMonth(gameweek.date)
+    const chosenMonthGameweeks: Gameweek[] = gameweeks.filter((gameweek) => (
+        isDateInMonth(potmLeaderboardMonth, gameweek.date)
     ))
     
     // list of players with their corresponding points accrued for current month
     const playersWithMonthPoints: PlayerWithMonthPoint[] = players
         .map(player => {
                 let points = 0
-                currentMonthGameweeks.forEach(gameweek => {
+                chosenMonthGameweeks.forEach(gameweek => {
                     points += gameweekstats.find(gameweekstat => (gameweekstat.gameweekID === gameweek.gameweekID && gameweekstat.playerID === player.playerID))?.points ?? 0
                 })
                 return {player: player, monthPoints:points}
@@ -45,7 +58,7 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
     const potmLeaderboardConfig: LeaderboardConfig = {
         lightModeColor: LeaderBoardColours.lightModeTextRose,
         darkModeColor: LeaderBoardColours.darkModeBorderRose,
-        headerText: `${getCurrentMonth()} POTM`,
+        headerText: `${getMonthName(potmLeaderboardMonth)} POTM`,
         displayEmoji: Emojis.potmLeaderBoardEmoji,
         sortedList: potmLeaderboardList
     };
@@ -66,7 +79,7 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
                             <Slider sliderItems={[...gameweeks].map((_, index) => `${index + 1}`)} selectedIdx={selectedGameweekIdx} reactToSelection={updateSelectedGameweekIdx}/>
                         </div>  
                 }
-                <Leaderboard leaderboardConfig={potmLeaderboardConfig}/>
+                <PotmLeaderboard leaderboardConfig={potmLeaderboardConfig} updateTableData={updatePotmTableData} />
             </div>
     )
 }

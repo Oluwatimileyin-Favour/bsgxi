@@ -21,7 +21,7 @@ export default async function StatsPage(){
     const ballondOrLeaderboardConfig: LeaderboardConfig = {
         lightModeColor: LeaderBoardColours.lightModeTextRose,
         darkModeColor: LeaderBoardColours.darkModeBorderRose,
-        headerText: "Road to Ballon d'Or",
+        headerText: "Road to Ballon d'Bsg",
         displayEmoji: Emojis.ballondorBoardEmoji,
         sortedList: ballondOrLeaderboardList
     };
