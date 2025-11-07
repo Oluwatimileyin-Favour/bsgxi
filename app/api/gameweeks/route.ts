@@ -1,10 +1,9 @@
-import { NextResponse } from "next/server";
-import { findMostFrequent } from "@/app/util/frequencyCalculator";
-import { createGameweek, deleteGameweek, findGameweekStatsByGameweekID, updateGameweek, updateGameweekPlayersTotalStats, updateGameweekStat} from "@/app/services/db.service";
-import { Gameweek, Gameweekstat } from "@prisma/client";
-import { ApiRouteActions } from "@/app/lib/ApiRouteActions";
 import ApiResponse from "@/app/interfaces/ApiResponse";
+import { ApiRouteActions } from "@/app/lib/ApiRouteActions";
+import { createGameweek, deleteGameweek, findGameweekStatsByGameweekID, updateGameweek, updateGameweekPlayersTotalStats, updateGameweekStat } from "@/app/services/db.service";
 import determineMOTM from "@/app/util/determineMOTM";
+import { Gameweek, Gameweekstat } from "@prisma/client";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {

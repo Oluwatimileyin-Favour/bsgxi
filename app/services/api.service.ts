@@ -3,6 +3,7 @@ import { ApiRouteActions } from "../lib/ApiRouteActions";
 import { GameweekType } from "../lib/GameweekTypes";
 import generateAdminCode from "../util/generateCode";
 import { sendPostRequest } from "./http.service";
+import ApiResponse from "../interfaces/ApiResponse";
 
 const adminCode =  generateAdminCode();
 
@@ -35,16 +36,16 @@ async function activateGameweek(date: string, nextGameweek: number, gameType: Ga
     
     try {
         const body = {action: ApiRouteActions.ACTIVATE_GAMEWEEK, payload: gameweek}
-        const req = await sendPostRequest<any>("/api/gameweeks", body);
-        if (req.success) {
-            return req.result;
+        const res = await sendPostRequest("/api/gameweeks", body);
+        if (res.success) {
+            return res.result;
         } 
         else {
-            throw("Request to activate a new gameweek failed");
+            throw("resuest to activate a new gameweek failed");
         }
     } 
 
-    catch (err) {
+    catch {
         alert("There was an issue with activating a new gameweek");
     }
 }
@@ -54,11 +55,15 @@ export async function deleteGameweek(gameweekId: number, shouldAlert: boolean = 
     try {
         const body = {action: ApiRouteActions.DELETE_GAMEWEEK, payload: gameweekId};
         
-        const req = await sendPostRequest<any>("/api/gameweeks", body);
-        req.success? alert("Deleted gameweek successfully") : alert("Error: " + req.error);
+        const res = await sendPostRequest("/api/gameweeks", body);
+        if (res.success) {
+            alert("Deleted gameweek successfully");
+        } else {
+            alert("Error: " + res.error);
+        }
     }
 
-    catch (err) {
+    catch{
         if(shouldAlert) alert("There was an issue updating full time score");
     }   
 }
@@ -91,11 +96,15 @@ export async function saveTeamSheets(adminCodeValue: string, date: string, nextG
         }
         
         const body = {action: ApiRouteActions.SAVE_TEAMS_ATTENDANCE, payload: teamInfo};
-        const req = await sendPostRequest<any>("/api/attendance", body);
-        req.success? alert("Teams saved successfully. Gameweek Activated") : alert("Error: " + req.error);
+        const res: ApiResponse = await sendPostRequest("/api/attendance", body);
+        if (res.success) {
+            alert("Teams saved successfully. Gameweek Activated");
+        } else {
+            alert("Error: " + res.error);
+        }
     } 
 
-    catch (err) {
+    catch {
 
         // gameweek is created first before teams are saved, so delete the created gameweek if error occurs
         if(newGameweek) deleteGameweek(newGameweek.gameweekID, false);
@@ -113,11 +122,15 @@ export async function adminCloseGameweek(adminCodeValue: string, gameweekId: num
     try {
         const body = {action: "closeGameweek", payload: gameweekId};
 
-        const req = await sendPostRequest<any>("/api/gameweeks", body);
-        req.success? alert("The gameweek was closed successfully!") : alert("Error: " + req.error);
+        const res = await sendPostRequest("/api/gameweeks", body);
+        if (res.success) {
+            alert("The gameweek was closed successfully!");
+        } else {
+            alert("Error: " + res.error);
+        }
     } 
 
-    catch (err) {
+    catch {
         alert("There was an issue with closing the gameweek");
     } 
 }
@@ -135,11 +148,15 @@ export async function updatePlayerGoals(enteredCode: string, goalsEntered: numbe
 
             const body = {action: ApiRouteActions.UPDATE_GOALS, payload: goals}; 
 
-            const req = await sendPostRequest<any>("/api/goals", body);
-            req.success? alert("Goals updated successfully!") : alert("Error: " + req.error);
+            const res = await sendPostRequest("/api/goals", body);
+            if (res.success) {
+                alert("Goals updated successfully!");
+            } else {
+                alert("Error: " + res.error);
+            }
         }
 
-        catch (err) {
+        catch {
             alert("There was an issue updating your goals");
         }           
     }
@@ -152,10 +169,10 @@ export async function updatePlayerMotmNomination(playerCode: string, nominatedPl
     try{
         const body = {action: ApiRouteActions.GET_PLAYER_AND_GAMEWEEKSTAT, payload:  {playerCode, gameweekId}};
 
-        const req = await sendPostRequest<any>("/api/nomination", body);
+        const res = await sendPostRequest("/api/nomination", body);
     
-        const nominator = req.result.player;
-        const nominatorGameweekstat = req.result.playerGameweekstat;
+        const nominator = res.result.player;
+        const nominatorGameweekstat = res.result.playerGameweekstat;
 
         if(nominator){
             if(!nominatorGameweekstat){
@@ -166,15 +183,19 @@ export async function updatePlayerMotmNomination(playerCode: string, nominatedPl
             const nominationPair = {gameweekStatId: nominatorGameweekstat?.gameweekStatID, nomineeId: nominatedPlayerId};
             const body = {action: ApiRouteActions.PLAYER_NOMINATE, payload: nominationPair}; 
             
-            const req = await sendPostRequest<any>("/api/nomination", body);
-            req.success? alert("Nomination saved successfully") : alert("Error: " + req.error);
+            const res = await sendPostRequest("/api/nomination", body);
+            if (res.success) {
+                alert("Nomination saved successfully");
+            } else {
+                alert("Error: " + res.error);
+            }
         }
         else {
             alert("Incorrect code");
         }
     }
 
-    catch (err) {
+    catch {
         alert("There was an issue updating your motm nomination");
     }  
 }
@@ -189,11 +210,15 @@ export async function updateFullTimeScore(adminCodeValue: string, gameweekId: nu
     try {
         const body = {gameweekId, whitescore, blackscore};
 
-        const req = await sendPostRequest<any>("/api/updatescore", body);
-        req.success? alert("Full time score updated successfully!") : alert("Error: " + req.error);
+        const res = await sendPostRequest("/api/updatescore", body);
+        if (res.success) {
+            alert("Full time score updated successfully!");
+        } else {
+            alert("Error: " + res.error);
+        }
     }
 
-    catch (err) {
+    catch {
         alert("There was an issue updating full time score");
     }   
 }
@@ -209,16 +234,20 @@ export async function updateMotmShortlist(adminCodeValue: string, removedNominee
     try{
         if(removedNomineesIds.length > 0) {
             const body = {action: ApiRouteActions.REMOVE_NOMINEES, payload: {playerIds: removedNomineesIds, gameweekId: gameweekId}}
-            await sendPostRequest<any>("/api/nomination", body);
+            await sendPostRequest("/api/nomination", body);
         }
 
         const body = {action: ApiRouteActions.ADMIN_SELECT_NOMINEES, payload: {playerIds: nomineesIds, gameweekId: gameweekId}};
-        const req = await sendPostRequest<any>("/api/nomination", body);
+        const res = await sendPostRequest("/api/nomination", body);
 
-        req.success? alert("Motm shortlist successfully updated!") : alert("Error: " + req.error);
+        if (res.success) {
+            alert("Motm shortlist successfully updated!");
+        } else {
+            alert("Error: " + res.error);
+        }
     }
 
-    catch (err) {
+    catch {
         alert("There was an issue updating motm shortlist");
     }   
 }
