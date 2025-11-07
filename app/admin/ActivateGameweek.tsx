@@ -5,13 +5,12 @@ import { Player } from "@prisma/client";
 import Dropdown from "../ui/Dropdown";
 import { GameweekType } from "../lib/GameweekTypes";
 import { TeamNumber } from "../lib/teamNumbers";
-import { saveTeamSheets } from "../services/admin.service";
+import { saveTeamSheets } from "../services/api.service";
 
 export default function ActivateGameweek({playerList, nextGameweek }: { playerList: Player[] , nextGameweek: number}) {
 
     //TODO
-    //potentially remove threeTeamGamePlayers and utilise teams
-    // This would involve updating the onclickplayer and onclickChosenPlayer functions to work with the teams array instead
+    // replace window.location.reload()
 
     const [players, updatePlayerList] = useState<Player[]>(playerList);
     const [teams, updateTeams] = useState<Player[][]>([[],[],[]]);
@@ -72,6 +71,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
 
     const saveTeams = async (date: string, adminCodeValue: string) => {
         saveTeamSheets(adminCodeValue, date, nextGameweek, gameType, teams[TeamNumber.Black], teams[TeamNumber.White], teams[TeamNumber.Red], threeTeamGamePlayers);
+        window.location.reload();
     }
 
     return (

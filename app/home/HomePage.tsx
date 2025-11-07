@@ -7,7 +7,7 @@ import { PlayerWithMonthPoint } from "../interfaces/PlayerWithMonthPoint";
 import Emojis from "../lib/emojis";
 import { LeaderBoardColours } from "../lib/TailwindColours";
 import { getCurrentMonth, getMonthName, isDateInMonth } from "../services/date.service";
-import PotmLeaderboard from "../ui/PotmLeaderboard";
+import PotmLeaderboard from "./PotmLeaderboard";
 import Slider from "../ui/Slider";
 import GameweekDetails from "./GameweekDetails";
 import Teamsheet from "./Teamsheet";

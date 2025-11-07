@@ -1,31 +1,46 @@
 import { NextResponse } from "next/server";
 import { Gameweekstat, Player} from "@prisma/client";
 import { createManyGameweekStats } from "@/app/services/db.service";
+import { TeamNumber } from "@/app/lib/teamNumbers";
+import { ApiRouteActions } from "@/app/lib/ApiRouteActions";
+import ApiResponse from "@/app/interfaces/ApiResponse";
 
 export async function POST(req: Request) {
   try {
-    const { teamInfo } = await req.json();
+    const body = await req.json();
 
-     const blackplayers = teamInfo.blackteam?.map((player: Player) => {
-        const gameweekStat: Partial<Gameweekstat> = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, team: 0, goals_scored: 0,  nomineeID: 100, points: 1, shortlisted: false}
-        return gameweekStat;
-    }) ?? []
+    if(body.action === ApiRouteActions.SAVE_TEAMS_ATTENDANCE){
 
-    const whiteplayers = teamInfo.whiteteam?.map((player: Player) => {
-        const gameweekStat: Partial<Gameweekstat> = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, team: 1, goals_scored: 0, nomineeID: 100, points: 1, shortlisted: false}
-        return gameweekStat;
-    }) ?? []
+      const {gameweekId, whiteteam, blackteam, redteam = []} = body.payload;
 
-    const redplayers = teamInfo.redteam?.map((player: Player) => {
-        const gameweekStat: Partial<Gameweekstat> = {gameweekID: teamInfo.gameweekID, playerID: player.playerID, team: 2, goals_scored: 0,  nomineeID: 100, points: 1, shortlisted: false}
-        return gameweekStat;
-    }) ?? []
-    
-    const gameweekStats = await createManyGameweekStats(blackplayers.concat(whiteplayers).concat(redplayers));
-    
-    return NextResponse.json({success: true, result: gameweekStats});
+      const blackplayers = blackteam?.map((player: Player) => {
+          const gameweekStat: Partial<Gameweekstat> = {gameweekID: gameweekId, playerID: player.playerID, team: TeamNumber.Black, goals_scored: 0,  nomineeID: 100, points: 1, shortlisted: false}
+          return gameweekStat;
+      }) ?? []
+
+      const whiteplayers = whiteteam?.map((player: Player) => {
+          const gameweekStat: Partial<Gameweekstat> = {gameweekID: gameweekId, playerID: player.playerID, team: TeamNumber.White, goals_scored: 0, nomineeID: 100, points: 1, shortlisted: false}
+          return gameweekStat;
+      }) ?? []
+
+      const redplayers = redteam?.map((player: Player) => {
+          const gameweekStat: Partial<Gameweekstat> = {gameweekID: gameweekId, playerID: player.playerID, team: TeamNumber.Red, goals_scored: 0,  nomineeID: 100, points: 1, shortlisted: false}
+          return gameweekStat;
+      }) ?? []
+      
+      await createManyGameweekStats(blackplayers.concat(whiteplayers).concat(redplayers));;
+      
+      const response: ApiResponse = {success: true};
+      return NextResponse.json(response, {status: 200});
+    }
   } 
-  catch (error) {
-    return NextResponse.json({success: false, error: error}, { status: 500 });
+  catch (err: unknown) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: err,
+      },
+      { status: 500 }
+    );
   }
 }

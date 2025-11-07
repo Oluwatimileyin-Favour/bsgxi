@@ -1,0 +1,1 @@
+Clean up every route.ts (use strong typing as much as possible)

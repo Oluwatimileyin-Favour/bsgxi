@@ -1,17 +1,40 @@
 import { NextResponse } from "next/server";
 import { updateGameweekStat } from "@/app/services/db.service";
+import { ApiRouteActions } from "@/app/lib/ApiRouteActions";
+import ApiResponse from "@/app/interfaces/ApiResponse";
 
 export async function POST(req: Request) {
   try {
-    const { goals } = await req.json();
+    const body = await req.json();
+
+    if(body.action === ApiRouteActions.UPDATE_GOALS){
+
+      const {gameweekStatId, goalsScored} =  body.payload;
+
+      if(gameweekStatId === null || goalsScored === null) {
+        const response: ApiResponse = {
+          success: false,
+          error: "Invalid gameweekStatId or goalsScored"
+        };
+        return NextResponse.json(response, { status: 400 }); 
+      }
+
+      const dataToUpdate = { goals_scored: parseInt(goalsScored)};
+      const updatedGameweekStat = updateGameweekStat(gameweekStatId, dataToUpdate);
     
-    const dataToUpdate = { goals_scored: parseInt(goals.goalsScored)};
-    const updatedGameweekStat = updateGameweekStat(goals.gameweekStatId, dataToUpdate);
-  
-    return NextResponse.json({ success: true, result: updatedGameweekStat});
+      const response: ApiResponse = {
+        success: true,
+        result: updatedGameweekStat
+      };
+      return NextResponse.json(response);
+    }
   } 
   
-  catch (error) {
-    return NextResponse.json({ success: false, error: error }, { status: 500 });
+  catch (err: unknown) {
+    const response: ApiResponse = {
+      success: false,
+      error: String(err)
+    };
+    return NextResponse.json(response, { status: 500 });
   }
 }

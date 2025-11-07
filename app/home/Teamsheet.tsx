@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Gameweek, Gameweekstat, Player } from "@prisma/client";
 import Emojis from "../lib/emojis";
 import { GameweekType } from "../lib/GameweekTypes";
-import UpdateGoalsForm from "./UpdateGoalsForm";
-import UpdateMotmNominationForm from "./UpdateMotmNominationForm";
+import { updatePlayerGoals, updatePlayerMotmNomination } from "../services/api.service";
 
 export default function Teamsheet({players, gameweek, gameweekstats}: {players: Player[], gameweek: Gameweek, gameweekstats: Gameweekstat[]}){
 
@@ -107,7 +106,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
 
                 <UpdateMotmNominationForm
                     selectedPlayer={selectedPlayer}
-                    gameweekID={gameweek.gameweekID}  
+                    gameweekId={gameweek.gameweekID}  
                     resetState={resetState} 
                 />
             }
@@ -116,7 +115,16 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
 }
 
 
-function RegularGameInterface ({teamBlackStats, teamWhiteStats, gameweek, players, motm, onSelectPlayer}: {teamBlackStats: Gameweekstat[], teamWhiteStats: Gameweekstat[], gameweek: Gameweek, players: Player[], motm: number, onSelectPlayer: (stats: Gameweekstat) => void}  ) {
+function RegularGameInterface ({teamBlackStats, teamWhiteStats, gameweek, players, motm, onSelectPlayer}: 
+    {
+        teamBlackStats: Gameweekstat[], 
+        teamWhiteStats: Gameweekstat[], 
+        gameweek: Gameweek, 
+        players: Player[], 
+        motm: number, 
+        onSelectPlayer: (stats: Gameweekstat) => void
+    }  
+){
     return (
         <>
             <div className="flex-1 text-center">
@@ -156,7 +164,14 @@ function RegularGameInterface ({teamBlackStats, teamWhiteStats, gameweek, player
 }
 
 
-function ClassicoGameInterface ({gameweekstats, players, motm, onSelectPlayer}: {gameweekstats: Gameweekstat[], players: Player[], motm: number, onSelectPlayer: (stats: Gameweekstat) => void}  ) {
+function ClassicoGameInterface ({gameweekstats, players, motm, onSelectPlayer}: 
+    {
+        gameweekstats: Gameweekstat[], 
+        players: Player[], 
+        motm: number, 
+        onSelectPlayer: (stats: Gameweekstat) => void
+    }  
+){
     return (
         <div className="flex flex-col items-center">
             <h3 className="font-bold text-xl text-rose-900"> Classico Players</h3>
@@ -165,9 +180,9 @@ function ClassicoGameInterface ({gameweekstats, players, motm, onSelectPlayer}: 
                     <li key={gameweekPlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium text-center"
                         onClick={() => onSelectPlayer(gameweekPlayer)}
                     >
-                        {(gameweekPlayer.team === 0) && <span>{'⬛'}</span>}  
-                        {(gameweekPlayer.team === 1) && <span>{'⬜'}</span>} 
-                        {(gameweekPlayer.team === 2) && <span>{'🟥'}</span>} 
+                        {(gameweekPlayer.team === 0) && <span>{Emojis.oldiesEmoji}</span>}  
+                        {(gameweekPlayer.team === 1) && <span>{Emojis.newbiesEmoji}</span>} 
+                        {(gameweekPlayer.team === 2) && <span>{Emojis.youngbloodEmoji}</span>} 
                         {(gameweekPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
                         {(gameweekPlayer.playerID != motm && gameweekPlayer.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
                         {players.find(player => player.playerID === gameweekPlayer.playerID)?.firstname} 
@@ -180,7 +195,14 @@ function ClassicoGameInterface ({gameweekstats, players, motm, onSelectPlayer}: 
 }
 
 
-function ThreeTeamGameInterface ({gameweekstats, players, motm, onSelectPlayer}: {gameweekstats: Gameweekstat[], players: Player[], motm: number, onSelectPlayer: (stats: Gameweekstat) => void}  ) {
+function ThreeTeamGameInterface ({gameweekstats, players, motm, onSelectPlayer}: 
+    {  
+        gameweekstats: Gameweekstat[], 
+        players: Player[], 
+        motm: number, 
+        onSelectPlayer: (stats: Gameweekstat) => void
+    }  
+){
     return (
         <div className="flex flex-col items-center">
             <h3 className="font-bold text-xl text-rose-900"> Gameweek Players</h3>
@@ -201,12 +223,14 @@ function ThreeTeamGameInterface ({gameweekstats, players, motm, onSelectPlayer}:
 }
 
 
-function ChooseActionMenu({updateNominateForMotmClickedStatus, updateEnterGoalsStatus, updatePlayerSelectionStatus, playerIsSelected}: {
-    updateNominateForMotmClickedStatus: (status: boolean) => void,
-    updateEnterGoalsStatus: (status: boolean) => void,
-    updatePlayerSelectionStatus: (status: boolean) => void,
-    playerIsSelected: boolean
-}) {
+function ChooseActionMenu({updateNominateForMotmClickedStatus, updateEnterGoalsStatus, updatePlayerSelectionStatus, playerIsSelected}: 
+    {
+        updateNominateForMotmClickedStatus: (status: boolean) => void,
+        updateEnterGoalsStatus: (status: boolean) => void,
+        updatePlayerSelectionStatus: (status: boolean) => void,
+        playerIsSelected: boolean
+    }
+){
 
     return (
         <div className="flex flex-col h-[250px] items-center">
@@ -228,5 +252,139 @@ function ChooseActionMenu({updateNominateForMotmClickedStatus, updateEnterGoalsS
                 Cancel
             </button>
         </div>
+    )
+}
+
+export function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, resetState}: 
+    {
+        selectedPlayer: Player | undefined,
+        selectedPlayerStats: Gameweekstat,
+        resetState: () => void,
+    }
+){
+    const goalsScoredRef = useRef<HTMLInputElement>(null);
+    const playerCodeRef = useRef<HTMLInputElement>(null);
+    const updateGoalsRef = useRef<HTMLButtonElement>(null);
+
+    const handleUpdateGoals = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const enteredCode = playerCodeRef.current?.value.trim() ?? "";
+        const goalsEntered = parseInt(goalsScoredRef.current?.value ?? "0");
+        const actualPlayerCode = selectedPlayer?.code.trim() ?? "";
+        const gameweekStatId = selectedPlayerStats.gameweekStatID;
+
+        updatePlayerGoals(enteredCode, goalsEntered, actualPlayerCode, gameweekStatId);
+        
+        window.location.reload();
+        resetState();
+    }
+
+    return (
+        <form
+            onSubmit={e => handleUpdateGoals(e)}
+            className="max-w-sm mx-auto dark:border-sky-400 dark:border-2 shadow-md rounded-lg p-6"
+        >
+            <div className="mb-4 space-y-2">
+                <label
+                    htmlFor="textInput"
+                    className="block text-lg font-bold text-red-700 dark:text-sky-400 mb-2"
+                >
+                {selectedPlayer?.firstname}
+                </label>
+                <label
+                    htmlFor="textInput"
+                    className="block text-sm font-medium text-gray-700 dark:text-sky-700 mb-2"
+                >
+                how many goals did you score?
+                </label>
+                <input
+                    type='number'
+                    id="textInput"
+                    ref={goalsScoredRef}
+                    name="textInput"
+                    placeholder="goals"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <input
+                    type="text"
+                    id="textInput"
+                    ref={playerCodeRef}
+                    name="textInput"
+                    placeholder="your code"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
+            <button
+                type="submit"
+                className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                ref={updateGoalsRef}
+            >
+                Save
+            </button>
+            <button
+                className="w-full my-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                onClick={resetState}
+            >
+                Cancel
+            </button>
+        </form>
+    )
+}
+
+export function UpdateMotmNominationForm({selectedPlayer, gameweekId, resetState} : 
+    {
+        selectedPlayer: Player | undefined,
+        gameweekId: number,
+        resetState: () => void,
+    }
+){
+    const playerCodeRef = useRef<HTMLInputElement>(null);
+    const handleNominationRef = useRef<HTMLButtonElement>(null);
+
+    const handleUpdateMotmNomination = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const playerCode = playerCodeRef.current?.value.trim() ?? "";
+        const nominatedPlayerId = selectedPlayer?.playerID ?? -1;
+        await updatePlayerMotmNomination(playerCode, nominatedPlayerId, gameweekId);
+
+        window.location.reload();
+        resetState();
+    }
+
+    return (
+        <form
+            onSubmit={e => handleUpdateMotmNomination(e)}
+            className="max-w-sm mx-auto shadow-md rounded-lg p-6 dark:border-sky-400 dark:border-2"
+        >
+            <div className="mb-4">
+                <label
+                htmlFor="textInput"
+                className="block text-lg font-bold text-red-700 dark:text-sky-400 mb-2"
+                >
+                Are you sure you want to nominate {selectedPlayer?.firstname} for MOTM?
+                </label>
+                <input
+                type="text"
+                id="textInput"
+                ref={playerCodeRef}
+                name="textInput"
+                placeholder="your code"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
+            <button
+                type="submit"
+                className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                ref={handleNominationRef}
+            >
+                Save
+            </button>
+            <button
+                className="w-full my-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                onClick={resetState}
+            >
+                Cancel
+            </button>
+        </form>
     )
 }

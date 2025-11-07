@@ -1,48 +1,115 @@
+import { ApiRouteActions } from "@/app/lib/ApiRouteActions";
+import { findGameweekStatsByPlayerIdAndGameweekId, findPlayerByCode, updateGameweekStat, updateGameweekStatsByPlayerIdsAndGameweekID } from "@/app/services/db.service";
+import { Gameweekstat, Player } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { Player } from "@prisma/client";
-import { updateGameweekStat, updateGameweekStatsByPlayerIdAndGameweekID} from "@/app/services/db.service";
-import { prisma } from "@/app/lib/prisma";
+import ApiResponse from "@/app/interfaces/ApiResponse";
 
 export async function POST(req: Request) {
-  try {
-    const { body } = await req.json();
+  try { 
+    const body  = await req.json();
 
-    if(body.action === "adminSelectNominees"){
-      const playerIds = body.payload.nominees.map((nominee: Player) => nominee.playerID);
-      const gameweekIds: number[] = [body.payload.gameweek.gameweekID];
-      const dataToUpdate = {shortlisted: true, points: 2};
-      const updatedGameweekStats = await updateGameweekStatsByPlayerIdAndGameweekID(playerIds, gameweekIds, dataToUpdate);
+    if(body.action === ApiRouteActions.ADMIN_SELECT_NOMINEES){
+      const {playerIds, gameweekId} = body.payload;
+      const dataToUpdate: Partial<Gameweekstat> = {shortlisted: true, points: 2};
+
+      if(gameweekId === null || playerIds === null) {
+        const response: ApiResponse = {
+          success: false,
+          error: "Invalid gameweekId or playerIds"
+        };
+        return NextResponse.json(response, { status: 400 }); 
+      }
+      
+      const res = await updateGameweekStatsByPlayerIdsAndGameweekID(playerIds, gameweekId, dataToUpdate);
     
-      return NextResponse.json({ success: true, message: updatedGameweekStats});
+      const response: ApiResponse = {
+        success: true,
+        result: `${res.count} nominees updated successfully`
+      };
+      return NextResponse.json(response);
     }
 
-    else if(body.action === "playerSelectNominee"){
-      const updatedMotmNomination = await updateGameweekStat(body.payload.gameweekStatId,  {nomineeID: body.payload.nomineeId})
+    else if(body.action === ApiRouteActions.PLAYER_NOMINATE){
+      const {gameweekStatId, nomineeId} = body.payload;
 
-      return NextResponse.json({ success: true, message: updatedMotmNomination});
+      if(gameweekStatId === null || nomineeId === null) {
+        const response: ApiResponse = {
+          success: false,
+          error: "Invalid gameweekStatId or nomineeId"
+        };
+        return NextResponse.json(response, { status: 400 }); 
+      }
+
+      const dataToUpdate: Partial<Gameweekstat> = {nomineeID: nomineeId};
+
+      const updatedGameweekStat = await updateGameweekStat(gameweekStatId,  dataToUpdate)
+
+      const response: ApiResponse = {
+        success: true,
+        result: updatedGameweekStat
+      };
+      return NextResponse.json(response);
     }
 
-    else if(body.action === "getNominatorAndTheirGameweekStat"){
-      const { playerCode, gameweekID } = body.payload;
+    else if(body.action === ApiRouteActions.GET_PLAYER_AND_GAMEWEEKSTAT){
+      const { playerCode, gameweekId } = body.payload;
 
-      const player = await prisma.player.findUnique({where:{ code: playerCode }});
-      const playerGameweekstat = await prisma.gameweekstat.findFirst({
-        where: {
-          playerID: player?.playerID,
-          gameweekID: gameweekID
-        }
-      })
+      if(playerCode === null || gameweekId === null) {
+        const response: ApiResponse = {
+          success: false,
+          error: "Invalid player code or gameweek ID"
+        };
+        return NextResponse.json(response, { status: 400 }); 
+      }
 
-      if (player) {
-        return NextResponse.json({success: true, result: {player, playerGameweekstat}});
+      const player: Player | null = await findPlayerByCode(playerCode);
+
+      if(!player) {
+        const response: ApiResponse = {
+          success: false,
+          error: "Player not found"
+        };
+        return NextResponse.json(response, { status: 404 }); 
+      }
+
+      const playerGameweekstat: Gameweekstat | null = await findGameweekStatsByPlayerIdAndGameweekId(player.playerID, gameweekId); 
+
+      if (playerGameweekstat) {
+        const response: ApiResponse = {
+          success: true,
+          result: {player, playerGameweekstat}
+        };
+        return NextResponse.json(response);
       }
       else {
-        return NextResponse.json({success: false, error: "Player not found"}, { status: 404 }); 
+        const response: ApiResponse = {
+          success: false,
+          error: "Error fetching player and their gameweekstat"
+        };
+        return NextResponse.json(response, { status: 404 }); 
       }
+    }
+
+    else if(body.action === ApiRouteActions.REMOVE_NOMINEES){
+      const playerIds: number[] = body.payload.playerIds;
+      const gameweekId: number = body.payload.gameweekId;
+      const dataToUpdate: Partial<Gameweekstat> = {shortlisted: false, points: 1};
+
+      const updatedGameweekStats = await updateGameweekStatsByPlayerIdsAndGameweekID(playerIds, gameweekId, dataToUpdate);
+
+      const response: ApiResponse = {
+        success: true,
+        result: updatedGameweekStats
+      };
+      return NextResponse.json(response);
     }
   } 
   
-  catch (error) {
-    return NextResponse.json({ success: false, error: error }, { status: 500 });
+  catch (err: unknown) {
+    const response: ApiResponse = {
+      success: false,
+      error: String(err)
+    };
+    return NextResponse.json(response, { status: 500 });
   }
 }
