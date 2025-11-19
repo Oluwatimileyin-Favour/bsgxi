@@ -2,17 +2,15 @@
 
 import { Gameweek, Player } from "@prisma/client";
 import { useRef, useState } from "react";
-import { adminCloseGameweek, updateFullTimeScore, updateMotmShortlist } from "../services/api.service";
+import { adminCloseGameweek, adminDeleteGameweek, updateFullTimeScore, updateMotmShortlist } from "../services/api.service";
 
-    //TODO
-    // replace window.location.reload()
-    
 export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeList}: {gameweekPlayerList: Player[], gameweek: Gameweek, nomineeList: Player[]}){
 
     const [nominees, updateNominees] = useState(nomineeList);
     const [removedNominees, updateRemovedNominees] = useState<Player[]>([]);
     const [gameweekPlayers, updateGameweekPlayers] = useState(gameweekPlayerList);
     const [closeGameweekClicked, setCloseGameweekClicked] = useState(false);
+    const [deleteGameweekClicked, setDeleteGameweekClicked] = useState(false);
 
     const adminCodeRef = useRef<HTMLInputElement>(null);
 
@@ -54,7 +52,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
         <div className="flex flex-col w-full lg:flex-row justify-between gap-4 p-10">
 
             {
-                !closeGameweekClicked &&
+                !closeGameweekClicked && !deleteGameweekClicked &&
 
                 <>
                     <div className="h-[500px] overflow-y-auto bg-gray-100 dark:border-red-500 dark:border-4 dark:bg-inherit p-4 rounded-lg shadow-md">
@@ -103,7 +101,13 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
 
                         <UpdateFullTimeScoreForm gameweek={gameweek} />
 
-                        <button className="px-4 py-2 rounded-2xl bg-rose-900 dark:bg-red-500 text-white hover:bg-rose-400 transition shadow-md h-20 w-60 my-auto" 
+                        <button className="px-4 py-2 rounded-2xl bg-rose-900 dark:bg-red-500 text-white hover:bg-rose-400 transition shadow-md h-14 w-60 my-auto" 
+                            onClick={() => setDeleteGameweekClicked(true)}
+                        >
+                            Delete Gameweek
+                        </button>
+
+                        <button className="px-4 py-2 rounded-2xl bg-rose-900 dark:bg-red-500 text-white hover:bg-rose-400 transition shadow-md h-14 w-60 my-auto" 
                             onClick={() => setCloseGameweekClicked(true)}
                         >
                             Close Gameweek
@@ -116,6 +120,15 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                 closeGameweekClicked &&
 
                 <CloseGameweekConfirmationForm 
+                    resetChoices={resetChoices} 
+                    gameweek={gameweek} 
+                />
+            } 
+
+            {
+                deleteGameweekClicked &&
+
+                <DeleteGameweekConfirmationForm 
                     resetChoices={resetChoices} 
                     gameweek={gameweek} 
                 />
@@ -150,7 +163,7 @@ function UpdateFullTimeScoreForm({gameweek}: {gameweek: Gameweek}) {
             <div className="mb-4 space-y-5">
                 <label
                 htmlFor="textInput"
-                className="block text-lg font-bold text-red-700 dark:text-rose-500 mb-2"
+                className="block text-lg font-bold text-rose-900 dark:text-rose-500 mb-2"
                 >
                 Update full time score
                 </label>
@@ -199,10 +212,17 @@ function CloseGameweekConfirmationForm({resetChoices, gameweek}: {resetChoices: 
     const adminCodeRef = useRef<HTMLInputElement>(null);
     const closeGameweekRef = useRef<HTMLButtonElement>(null);
 
+    async function handleCloseGameweek() {
+        const adminCodeEntered: string = adminCodeRef.current?.value ?? "";
+        const gameweekId: number  = gameweek.gameweekID;
+
+        await adminCloseGameweek(adminCodeEntered, gameweekId);
+    }
+
     return (
         <form
-            className="max-w-sm mx-auto dark:border-red-500 dark:border-4 dark:bg-inherit  shadow-md rounded-lg p-6"
-            onSubmit={() => adminCloseGameweek(adminCodeRef.current?.value ?? "", gameweek.gameweekID)}
+            className="max-w-sm mx-auto dark:border-red-500 dark:border-4 dark:bg-inherit shadow-md rounded-lg p-6"
+            onSubmit={handleCloseGameweek}
         >
             <div className="mb-4">
                 <label
@@ -210,6 +230,57 @@ function CloseGameweekConfirmationForm({resetChoices, gameweek}: {resetChoices: 
                 className="block text-lg font-bold text-red-700 dark:text-rose-500 mb-2"
                 >
                 Are you sure you want to close the gameweek
+                </label>
+                <input
+                    type="text"
+                    id="textInput"
+                    ref={adminCodeRef}
+                    name="textInput"
+                    placeholder="admin code"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
+            <button
+                type="submit"
+                className="w-full my-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                ref={closeGameweekRef}
+            >
+                I&apos;m sure
+            </button>
+            <button
+                className="w-full my-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                onClick={resetChoices}
+            >
+                Cancel
+            </button>
+        </form>
+    )
+}
+
+
+function DeleteGameweekConfirmationForm({resetChoices, gameweek}: {resetChoices: () => void, gameweek: Gameweek}) {
+
+    const adminCodeRef = useRef<HTMLInputElement>(null);
+    const closeGameweekRef = useRef<HTMLButtonElement>(null);
+
+    async function handleDeleteGameweek() {
+        const adminCodeEntered: string = adminCodeRef.current?.value ?? "";
+        const gameweekId: number  = gameweek.gameweekID;
+
+        await adminDeleteGameweek(adminCodeEntered, gameweekId);
+    }
+
+    return (
+        <form
+            className="max-w-sm mx-auto dark:border-red-500 dark:border-4 dark:bg-inherit shadow-md rounded-lg p-6"
+            onSubmit={handleDeleteGameweek}
+        >
+            <div className="mb-4">
+                <label
+                htmlFor="textInput"
+                className="block text-lg font-bold text-red-700 dark:text-rose-500 mb-2"
+                >
+                THIS WILL DELETE THE GAMEWEEK. IT IS NOT REVERSIBLE
                 </label>
                 <input
                     type="text"

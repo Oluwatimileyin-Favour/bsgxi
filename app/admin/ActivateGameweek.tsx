@@ -9,9 +9,6 @@ import { saveTeamSheets } from "../services/api.service";
 
 export default function ActivateGameweek({playerList, nextGameweek }: { playerList: Player[] , nextGameweek: number}) {
 
-    //TODO
-    // replace window.location.reload()
-
     const [players, updatePlayerList] = useState<Player[]>(playerList);
     const [teams, updateTeams] = useState<Player[][]>([[],[],[]]);
     const [threeTeamGamePlayers, updateThreeTeamGamePlayers] = useState<Player[]>([]);
@@ -70,7 +67,7 @@ export default function ActivateGameweek({playerList, nextGameweek }: { playerLi
     }
 
     const saveTeams = async (date: string, adminCodeValue: string) => {
-        saveTeamSheets(adminCodeValue, date, nextGameweek, gameType, teams[TeamNumber.Black], teams[TeamNumber.White], teams[TeamNumber.Red], threeTeamGamePlayers);
+        await saveTeamSheets(adminCodeValue, date, nextGameweek, gameType, teams[TeamNumber.Black], teams[TeamNumber.White], teams[TeamNumber.Red], threeTeamGamePlayers);
         window.location.reload();
     }
 
@@ -256,6 +253,14 @@ function AdminControlInterface({gameType, handleUpdateGameType, saveTeams}:
     const dateRef = useRef<HTMLInputElement | null>(null);
     const adminCodeRef = useRef<HTMLInputElement>(null);
 
+    function handleSaveTeams() {
+
+        const gameweekDate: string = (dateRef.current?.value) ?? "";
+        const adminCodeEntered: string = (adminCodeRef.current?.value) ?? "";
+
+        saveTeams(gameweekDate, adminCodeEntered);
+    }
+
     return (
         <div className="flex flex-col gap-5 w-[300px] p-2 self-center justify-around items-center shadow-md bg-gray-100 dark:border-sky-400 dark:border-4 dark:bg-inherit">
 
@@ -276,7 +281,7 @@ function AdminControlInterface({gameType, handleUpdateGameType, saveTeams}:
                 className="px-3 py-2 border border-gray-300 dark:border-sky-400 dark:border-2 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-500"
             />  
 
-            <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-20 w-[50%]" onClick={() => saveTeams((dateRef.current?.value) ?? "", (adminCodeRef.current?.value) ?? "")}>
+            <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-20 w-[50%]" onClick={handleSaveTeams}>
                 Activate Gameweek
             </button>
         </div>

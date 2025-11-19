@@ -266,17 +266,16 @@ export function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, resetState
     const playerCodeRef = useRef<HTMLInputElement>(null);
     const updateGoalsRef = useRef<HTMLButtonElement>(null);
 
-    const handleUpdateGoals = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleUpdateGoals = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const enteredCode = playerCodeRef.current?.value.trim() ?? "";
         const goalsEntered = parseInt(goalsScoredRef.current?.value ?? "0");
         const actualPlayerCode = selectedPlayer?.code.trim() ?? "";
         const gameweekStatId = selectedPlayerStats.gameweekStatID;
 
-        updatePlayerGoals(enteredCode, goalsEntered, actualPlayerCode, gameweekStatId);
+        await updatePlayerGoals(enteredCode, goalsEntered, actualPlayerCode, gameweekStatId);
         
         window.location.reload();
-        resetState();
     }
 
     return (
@@ -348,7 +347,6 @@ export function UpdateMotmNominationForm({selectedPlayer, gameweekId, resetState
         await updatePlayerMotmNomination(playerCode, nominatedPlayerId, gameweekId);
 
         window.location.reload();
-        resetState();
     }
 
     return (

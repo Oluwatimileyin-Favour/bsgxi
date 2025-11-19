@@ -1,1 +1,1 @@
-Clean up every route.ts (use strong typing as much as possible)
+Replace window.location.reload() with proper data refresh technique(s)

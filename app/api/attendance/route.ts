@@ -13,28 +13,30 @@ export async function POST(req: Request) {
 
       const {gameweekId, whiteteam, blackteam, redteam = []} = body.payload;
 
-      const blackplayers = blackteam?.map((player: Player) => {
+      const blackPlayersStats = blackteam?.map((player: Player) => {
           const gameweekStat: Partial<Gameweekstat> = {gameweekID: gameweekId, playerID: player.playerID, team: TeamNumber.Black, goals_scored: 0,  nomineeID: 100, points: 1, shortlisted: false}
           return gameweekStat;
       }) ?? []
 
-      const whiteplayers = whiteteam?.map((player: Player) => {
+      const whitePlayersStats = whiteteam?.map((player: Player) => {
           const gameweekStat: Partial<Gameweekstat> = {gameweekID: gameweekId, playerID: player.playerID, team: TeamNumber.White, goals_scored: 0, nomineeID: 100, points: 1, shortlisted: false}
           return gameweekStat;
       }) ?? []
 
-      const redplayers = redteam?.map((player: Player) => {
+      const redPlayersStats = redteam?.map((player: Player) => {
           const gameweekStat: Partial<Gameweekstat> = {gameweekID: gameweekId, playerID: player.playerID, team: TeamNumber.Red, goals_scored: 0,  nomineeID: 100, points: 1, shortlisted: false}
           return gameweekStat;
       }) ?? []
       
-      await createManyGameweekStats(blackplayers.concat(whiteplayers).concat(redplayers));;
+      await createManyGameweekStats(blackPlayersStats.concat(whitePlayersStats).concat(redPlayersStats));;
       
       const response: ApiResponse = {success: true};
       return NextResponse.json(response, {status: 200});
     }
   } 
   catch (err: unknown) {
+
+    console.error(err);
     return NextResponse.json(
       {
         success: false,

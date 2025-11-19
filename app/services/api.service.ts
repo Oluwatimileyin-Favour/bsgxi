@@ -50,7 +50,11 @@ async function activateGameweek(date: string, nextGameweek: number, gameType: Ga
     }
 }
 
-export async function deleteGameweek(gameweekId: number, shouldAlert: boolean = true) {
+export async function adminDeleteGameweek(adminCodeValue: string, gameweekId: number, shouldAlert: boolean = true) {
+    if(adminCodeValue != adminCode){
+        alert("Incorrect Code");
+        return;
+    }
 
     try {
         const body = {action: ApiRouteActions.DELETE_GAMEWEEK, payload: gameweekId};
@@ -64,7 +68,7 @@ export async function deleteGameweek(gameweekId: number, shouldAlert: boolean = 
     }
 
     catch{
-        if(shouldAlert) alert("There was an issue updating full time score");
+        if(shouldAlert) alert("There was an issue deleting the gameweek");
     }   
 }
 
@@ -91,12 +95,13 @@ export async function saveTeamSheets(adminCodeValue: string, date: string, nextG
         else if(gameType === GameweekType.Classico){
             teamInfo = {gameweekId: newGameweek.gameweekID, whiteteam: teamWhite, blackteam: teamBlack, redteam: teamRed};
         }
-        else{ //for threeteam games, put everyone on white team
+        else if(gameType === GameweekType.ThreeTeam){ //for threeteam games, put everyone on white team
             teamInfo = {gameweekId: newGameweek.gameweekID, whiteteam: threeTeamGamePlayers, blackteam: []}
         }
         
         const body = {action: ApiRouteActions.SAVE_TEAMS_ATTENDANCE, payload: teamInfo};
         const res: ApiResponse = await sendPostRequest("/api/attendance", body);
+
         if (res.success) {
             alert("Teams saved successfully. Gameweek Activated");
         } else {
@@ -107,8 +112,8 @@ export async function saveTeamSheets(adminCodeValue: string, date: string, nextG
     catch {
 
         // gameweek is created first before teams are saved, so delete the created gameweek if error occurs
-        if(newGameweek) deleteGameweek(newGameweek.gameweekID, false);
-        alert("There was an issue with closing the gameweek");
+        if(newGameweek) adminDeleteGameweek(generateAdminCode(), newGameweek.gameweekID, true);
+        alert("There was an issue with creating a new gameweek");
     }
 }
 
@@ -120,7 +125,7 @@ export async function adminCloseGameweek(adminCodeValue: string, gameweekId: num
     }
 
     try {
-        const body = {action: "closeGameweek", payload: gameweekId};
+        const body = {action: ApiRouteActions.CLOSE_GAMEWEEK, payload: gameweekId};
 
         const res = await sendPostRequest("/api/gameweeks", body);
         if (res.success) {
