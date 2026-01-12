@@ -28,7 +28,7 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
             const newMonth = prevMonth + monthChange;
             if (newMonth < 0) return 11;
             if (newMonth > 11) return 0;
-            if (newMonth > currentMonth) return currentMonth;
+            // if (newMonth > currentMonth) return currentMonth;
             return newMonth;
         });
     }

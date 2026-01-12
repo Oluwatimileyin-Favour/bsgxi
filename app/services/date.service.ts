@@ -1,6 +1,6 @@
 export function isDateInMonth(month: number, date: Date): boolean {
     const now = new Date();
-    return date.getFullYear() === now.getFullYear() && date.getMonth() === month;
+    return date.getFullYear() === now.getFullYear()-1 && date.getMonth() === month;
 }
 
 export function getCurrentMonth(): number {
