@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). This app has real users. View it here: https://bsgxi-a0hyd5gxghg5bnhx.southafricanorth-01.azurewebsites.net/
 
 ## Getting Started
 
