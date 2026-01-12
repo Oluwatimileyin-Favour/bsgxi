@@ -24,7 +24,7 @@ export default function HomePage({players, gameweeks, gameweekstats}: {players: 
     function updatePotmTableData(monthChange: number) {
         // don't allow going past current month
         setPotmLeaderboardMonth(prevMonth => {
-            const currentMonth = getCurrentMonth();
+          //  const currentMonth = getCurrentMonth();
             const newMonth = prevMonth + monthChange;
             if (newMonth < 0) return 11;
             if (newMonth > 11) return 0;
