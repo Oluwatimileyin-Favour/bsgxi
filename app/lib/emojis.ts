@@ -9,4 +9,8 @@ export default class Emojis {
     static readonly oldiesEmoji: string = '⬛';
     static readonly newbiesEmoji: string = '⬜';
     static readonly youngbloodEmoji: string = '🟥';
+    static readonly needToLoginEmoji: string = '😀';
+    static readonly needToRegister: string = '😅';
+    static readonly viewAsAGuest: string = '🙃'
+    static readonly eish: string = '😄'
 }

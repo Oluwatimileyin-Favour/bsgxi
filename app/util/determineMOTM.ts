@@ -1,10 +1,11 @@
-import { Gameweekstat } from "@prisma/client";
+import { MatchdayStat } from "@/generated/prisma/client";
 import { findMostFrequent } from "./frequencyCalculator";
+import { DummyPlayer } from "../lib/DummyData";
 
-export default function determineMOTM(gameweekStats: Gameweekstat[]): number {
+export default function determineMOTM(gameweekStats: MatchdayStat[]): number {
     const nominatedPlayers: number[] = gameweekStats
-        .map(gameweekStat => gameweekStat.nomineeID)
-        .filter((nominee): nominee is number => nominee !== null && nominee !== undefined && nominee !== 100);
+        .map(gameweekStat => gameweekStat.nominee_id)
+        .filter((nominee): nominee is number => nominee !== null && nominee !== undefined && nominee !== DummyPlayer.id);
     
     let motm: number = nominatedPlayers[0] ?? -1;  //set motm (man of the match) to -1 if no one was nominated at all
 

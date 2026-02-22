@@ -1,15 +1,17 @@
-import { useState } from "react"
+import { useState } from "react";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 
 // takes in a list of items to be displayed in a slider format
-// and the index of the cuurently selected item  to highlight it
+// and the index of the currently selected item  to highlight it
 // and a function to react to the selection of an item
-export default function Slider({sliderItems, selectedIdx, reactToSelection}: {sliderItems: string[], selectedIdx: number, reactToSelection: (idx: number) => void}) {
+export default function Pager({pagerItems, selectedIdx, reactToSelection}: {pagerItems: string[], selectedIdx: number, reactToSelection: (idx: number) => void}) {
 
     const numItemsPerSlide = 4
     const initialIdx = numItemsPerSlide * (Math.ceil((selectedIdx + 1)/numItemsPerSlide)-1)
 
     const [startIdx, updateStartIdx] = useState(initialIdx); 
+
+    if(startIdx > pagerItems.length) updateStartIdx(0); // addresing lack of sync between context and state
 
     function handleSlideLeft(){
         if(startIdx >= numItemsPerSlide){
@@ -18,7 +20,7 @@ export default function Slider({sliderItems, selectedIdx, reactToSelection}: {sl
     }
 
     function handleSlideRight(){
-        if((sliderItems.length - (startIdx + 1)) >= numItemsPerSlide){
+        if((pagerItems.length - (startIdx + 1)) >= numItemsPerSlide){
             updateStartIdx(startIdx + numItemsPerSlide);
         }
     }
@@ -28,7 +30,7 @@ export default function Slider({sliderItems, selectedIdx, reactToSelection}: {sl
         <div className="mt-5 flex items-center justify-center w-[300px] rounded-lg text-white">
             <span className="flex justify-center min-w-[50px] max-w-[150px] p-2 bg-sky-400 rounded-lg text-center shrink-0 fine-pointer:hover:bg-rose-200 cursor-pointer" onClick={handleSlideLeft}><HiOutlineChevronLeft/></span>
             <ul className="flex justify-center gap-2 p-2">
-                {sliderItems.map((item, index) => (
+                {pagerItems.map((item, index) => (
                     index >= startIdx && index < (startIdx + numItemsPerSlide) &&
 
                     (

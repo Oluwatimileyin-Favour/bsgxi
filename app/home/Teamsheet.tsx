@@ -1,38 +1,58 @@
 'use client'
 
-import { useRef, useState } from "react";
-import { Gameweek, Gameweekstat, Player } from "@prisma/client";
+import { Matchday, MatchdayStat, Player } from "@/generated/prisma/client";
+import { useContext, useRef, useState } from "react";
+import { GlobalAppDataContext } from "../context/GlobalAppDataContext";
 import Emojis from "../lib/emojis";
 import { GameweekType } from "../lib/GameweekTypes";
-import { updatePlayerGoals, updatePlayerMotmNomination } from "../services/api.service";
+import { UpdateGoals, UpdateMotmNomination } from "../services/player.service";
 
-export default function Teamsheet({players, gameweek, gameweekstats}: {players: Player[], gameweek: Gameweek, gameweekstats: Gameweekstat[]}){
+export default function Teamsheet({selectedGameweekIdx}: {selectedGameweekIdx: number}){
 
-    const [selectedPlayerStats, updateSelectedPlayerStats] = useState<Gameweekstat>(gameweekstats[0]);
+    //todo
+    // can replace players with PlayerSeasonStat
+
+    const {players, matchdays, matchdayStats, loggedInPlayer, season} = useContext(GlobalAppDataContext);
+
+    const matchday = matchdays[selectedGameweekIdx];
+
+    let selectedGameweekStats: MatchdayStat[];
+
+    //create getSeasonIdx function
+    if(season === 2) {
+        selectedGameweekStats = matchdayStats.filter(matchdayStat => matchdayStat.matchday_id === (selectedGameweekIdx + 37));
+    }
+    else{
+        selectedGameweekStats = matchdayStats.filter(matchdayStat => matchdayStat.matchday_id === (selectedGameweekIdx));
+    }
+
+    const [selectedPlayerStats, updateSelectedPlayerStats] = useState<MatchdayStat>(selectedGameweekStats[0]);
     const [playerIsSelected, updatePlayerSelectionStatus] = useState<boolean>(false);
     const [nominateForMotmClicked, updateNominateForMotmClickedStatus] = useState<boolean>(false);
     const [enterGoalsClicked, updateEnterGoalsClickedStatus] = useState<boolean>(false);
     
-    const selectedPlayer = players.find(player => player.playerID === selectedPlayerStats.playerID);
+    const selectedPlayer = players.find(player => player.id === selectedPlayerStats.player_id);
 
-    const motmPlayerID: number = gameweek.motm ?? -1;
+    const motmPlayerID: number = matchday.motm ?? -1;
 
-    const teamBlackStats: Gameweekstat[] = gameweekstats.filter(stat => {
+    const teamBlackStats: MatchdayStat[] = selectedGameweekStats.filter(stat => {
         return stat.team === 0
     }) ?? []
     
-    const teamWhiteStats: Gameweekstat[] = gameweekstats.filter(stat => {
+    const teamWhiteStats: MatchdayStat[] = selectedGameweekStats.filter(stat => {
         return stat.team === 1
     }) ?? []
 
-    const onSelectPlayer = (playerStats: Gameweekstat) => {
-        if(gameweek.isactive){
-            updateSelectedPlayerStats(playerStats)
-            updatePlayerSelectionStatus(!playerIsSelected)
+    const onSelectPlayer = (playerStats: MatchdayStat) => {
+        if(loggedInPlayer){
+            if(matchday.isactive){
+                updateSelectedPlayerStats(playerStats)
+                updatePlayerSelectionStatus(!playerIsSelected)
+            }
+           else {
+                alert("Matchday has been closed")
+           }
         }
-       else {
-            alert("Gameweek has been closed")
-       }
     }
 
     const resetState = () => {
@@ -46,12 +66,12 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
             {/* Would show only one of the blocks below depending on the condition met */}
 
             {
-                !playerIsSelected && gameweek.gametype.trim() === GameweekType.Regular &&
+                !playerIsSelected && matchday.gametype.trim() === GameweekType.Regular &&
 
                 <RegularGameInterface
                     teamBlackStats={teamBlackStats}
                     teamWhiteStats={teamWhiteStats}
-                    gameweek={gameweek}
+                    gameweek={matchday}
                     players={players}
                     motm={motmPlayerID}
                     onSelectPlayer={onSelectPlayer}
@@ -59,10 +79,10 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
             }
 
             {
-                !playerIsSelected && gameweek.gametype.trim() === GameweekType.Classico &&
+                !playerIsSelected && matchday.gametype.trim() === GameweekType.Classico &&
 
                 <ClassicoGameInterface
-                    gameweekstats={gameweekstats}
+                    selectedGameweekStats={selectedGameweekStats}
                     players={players}
                     motm={motmPlayerID}
                     onSelectPlayer={onSelectPlayer}
@@ -70,10 +90,10 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
             }
 
             {
-                !playerIsSelected && gameweek.gametype.trim() === GameweekType.ThreeTeam &&
+                !playerIsSelected && matchday.gametype.trim() === GameweekType.ThreeTeam &&
 
                 <ThreeTeamGameInterface
-                    gameweekstats={gameweekstats}
+                    selectedGameweekStats={selectedGameweekStats}
                     players={players}
                     motm={motmPlayerID}
                     onSelectPlayer={onSelectPlayer}
@@ -106,7 +126,7 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
 
                 <UpdateMotmNominationForm
                     selectedPlayer={selectedPlayer}
-                    gameweekId={gameweek.gameweekID}  
+                    gameweekId={matchday.id}  
                     resetState={resetState} 
                 />
             }
@@ -117,14 +137,15 @@ export default function Teamsheet({players, gameweek, gameweekstats}: {players: 
 
 function RegularGameInterface ({teamBlackStats, teamWhiteStats, gameweek, players, motm, onSelectPlayer}: 
     {
-        teamBlackStats: Gameweekstat[], 
-        teamWhiteStats: Gameweekstat[], 
-        gameweek: Gameweek, 
+        teamBlackStats: MatchdayStat[], 
+        teamWhiteStats: MatchdayStat[], 
+        gameweek: Matchday, 
         players: Player[], 
         motm: number, 
-        onSelectPlayer: (stats: Gameweekstat) => void
+        onSelectPlayer: (stats: MatchdayStat) => void
     }  
 ){
+
     return (
         <>
             <div className="flex-1 text-center">
@@ -132,12 +153,12 @@ function RegularGameInterface ({teamBlackStats, teamWhiteStats, gameweek, player
                 <h3 className="font-bold text-xl text-rose-900 dark:text-rose-500 md:hidden">{gameweek.blackscore} {Emojis.goalEmoji}</h3>
                 <ul className="flex flex-col gap-y-4 mt-2">
                     {teamBlackStats.map((teamBlackPlayerStat) => (
-                        <li key={teamBlackPlayerStat.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium"
+                        <li key={teamBlackPlayerStat.id} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium"
                             onClick={() => onSelectPlayer(teamBlackPlayerStat)}
                         >
-                            {(teamBlackPlayerStat.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
-                            {(teamBlackPlayerStat.playerID != motm && teamBlackPlayerStat.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
-                            {players.find(player => player.playerID === teamBlackPlayerStat.playerID)?.firstname} 
+                            {(teamBlackPlayerStat.player_id === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
+                            {(teamBlackPlayerStat.id != motm && teamBlackPlayerStat.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
+                            {players.find(player => player.id === teamBlackPlayerStat.player_id)?.firstname} 
                             {(teamBlackPlayerStat.goals_scored ?? 0) > 0 && <span>- {teamBlackPlayerStat.goals_scored} {Emojis.goalEmoji}</span>} 
                         </li>
                     ))}
@@ -148,12 +169,12 @@ function RegularGameInterface ({teamBlackStats, teamWhiteStats, gameweek, player
                 <h3 className="font-bold text-xl text-rose-900 dark:text-rose-500 md:hidden">{gameweek.whitescore} {Emojis.goalEmoji}</h3>
                 <ul className="flex flex-col gap-y-4 mt-2">
                     {teamWhiteStats.map((teamWhiteStatsPlayer) => (
-                        <li key={teamWhiteStatsPlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium"
+                        <li key={teamWhiteStatsPlayer.id} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium"
                             onClick={() => onSelectPlayer(teamWhiteStatsPlayer)}
                         >
-                            {(teamWhiteStatsPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
-                            {(teamWhiteStatsPlayer.playerID != motm && teamWhiteStatsPlayer.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
-                            {players.find(player => player.playerID === teamWhiteStatsPlayer.playerID)?.firstname} 
+                            {(teamWhiteStatsPlayer.player_id === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
+                            {(teamWhiteStatsPlayer.id != motm && teamWhiteStatsPlayer.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
+                            {players.find(player => player.id === teamWhiteStatsPlayer.player_id)?.firstname} 
                             {(teamWhiteStatsPlayer.goals_scored ?? 0) > 0 && <span>- {teamWhiteStatsPlayer.goals_scored} {Emojis.goalEmoji}</span>}
                         </li>
                     ))}
@@ -164,29 +185,29 @@ function RegularGameInterface ({teamBlackStats, teamWhiteStats, gameweek, player
 }
 
 
-function ClassicoGameInterface ({gameweekstats, players, motm, onSelectPlayer}: 
+function ClassicoGameInterface ({selectedGameweekStats, players, motm, onSelectPlayer}: 
     {
-        gameweekstats: Gameweekstat[], 
+        selectedGameweekStats: MatchdayStat[], 
         players: Player[], 
         motm: number, 
-        onSelectPlayer: (stats: Gameweekstat) => void
+        onSelectPlayer: (stats: MatchdayStat) => void
     }  
 ){
     return (
         <div className="flex flex-col items-center">
             <h3 className="font-bold text-xl text-rose-900"> Classico Players</h3>
             <ul className="grid grid-cols-2 gap-4 mt-4">
-                {gameweekstats.map((gameweekPlayer) => (
-                    <li key={gameweekPlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium text-center"
-                        onClick={() => onSelectPlayer(gameweekPlayer)}
+                {selectedGameweekStats.map((gameweekPlayerStat) => (
+                    <li key={gameweekPlayerStat.id} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium text-center"
+                        onClick={() => onSelectPlayer(gameweekPlayerStat)}
                     >
-                        {(gameweekPlayer.team === 0) && <span>{Emojis.oldiesEmoji}</span>}  
-                        {(gameweekPlayer.team === 1) && <span>{Emojis.newbiesEmoji}</span>} 
-                        {(gameweekPlayer.team === 2) && <span>{Emojis.youngbloodEmoji}</span>} 
-                        {(gameweekPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
-                        {(gameweekPlayer.playerID != motm && gameweekPlayer.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
-                        {players.find(player => player.playerID === gameweekPlayer.playerID)?.firstname} 
-                        {(gameweekPlayer.goals_scored ?? 0) > 0 && <span>- {gameweekPlayer.goals_scored} {Emojis.goalEmoji}</span>} 
+                        {(gameweekPlayerStat.team === 0) && <span>{Emojis.oldiesEmoji}</span>}  
+                        {(gameweekPlayerStat.team === 1) && <span>{Emojis.newbiesEmoji}</span>} 
+                        {(gameweekPlayerStat.team === 2) && <span>{Emojis.youngbloodEmoji}</span>} 
+                        {(gameweekPlayerStat.player_id === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
+                        {(gameweekPlayerStat.player_id != motm && gameweekPlayerStat.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
+                        {players.find(player => player.id === gameweekPlayerStat.player_id)?.firstname} 
+                        {(gameweekPlayerStat.goals_scored ?? 0) > 0 && <span>- {gameweekPlayerStat.goals_scored} {Emojis.goalEmoji}</span>} 
                     </li>
                 ))}
             </ul>
@@ -195,26 +216,26 @@ function ClassicoGameInterface ({gameweekstats, players, motm, onSelectPlayer}:
 }
 
 
-function ThreeTeamGameInterface ({gameweekstats, players, motm, onSelectPlayer}: 
+function ThreeTeamGameInterface ({selectedGameweekStats, players, motm, onSelectPlayer}: 
     {  
-        gameweekstats: Gameweekstat[], 
+        selectedGameweekStats: MatchdayStat[], 
         players: Player[], 
         motm: number, 
-        onSelectPlayer: (stats: Gameweekstat) => void
+        onSelectPlayer: (stats: MatchdayStat) => void
     }  
 ){
     return (
         <div className="flex flex-col items-center">
             <h3 className="font-bold text-xl text-rose-900"> Gameweek Players</h3>
             <ul className="grid grid-cols-2 gap-4 mt-4">
-                {gameweekstats.map((gameweekPlayer) => (
-                    <li key={gameweekPlayer.playerID} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium text-center"
-                        onClick={() => onSelectPlayer(gameweekPlayer)}
+                {selectedGameweekStats.map((gameweekPlayerStat) => (
+                    <li key={gameweekPlayerStat.id} className="rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer font-medium text-center"
+                        onClick={() => onSelectPlayer(gameweekPlayerStat)}
                     >
-                        {(gameweekPlayer.playerID === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
-                        {(gameweekPlayer.playerID != motm && gameweekPlayer.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
-                        {players.find(player => player.playerID === gameweekPlayer.playerID)?.firstname} 
-                        {(gameweekPlayer.goals_scored ?? 0) > 0 && <span>- {gameweekPlayer.goals_scored} {Emojis.goalEmoji}</span>} 
+                        {(gameweekPlayerStat.player_id === motm) && <span>{Emojis.motmWinnerEmoji}</span>} 
+                        {(gameweekPlayerStat.player_id != motm && gameweekPlayerStat.shortlisted) && <span>{Emojis.shortlistedPlayerEmoji}</span>} 
+                        {players.find(player => player.id === gameweekPlayerStat.player_id)?.firstname} 
+                        {(gameweekPlayerStat.goals_scored ?? 0) > 0 && <span>- {gameweekPlayerStat.goals_scored} {Emojis.goalEmoji}</span>} 
                     </li>
                 ))}
             </ul>
@@ -258,22 +279,22 @@ function ChooseActionMenu({updateNominateForMotmClickedStatus, updateEnterGoalsS
 export function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, resetState}: 
     {
         selectedPlayer: Player | undefined,
-        selectedPlayerStats: Gameweekstat,
+        selectedPlayerStats: MatchdayStat,
         resetState: () => void,
     }
 ){
     const goalsScoredRef = useRef<HTMLInputElement>(null);
-    const playerCodeRef = useRef<HTMLInputElement>(null);
     const updateGoalsRef = useRef<HTMLButtonElement>(null);
+
+    const {loggedInPlayer} = useContext(GlobalAppDataContext);
 
     const handleUpdateGoals = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const enteredCode = playerCodeRef.current?.value.trim() ?? "";
-        const goalsEntered = parseInt(goalsScoredRef.current?.value ?? "0");
-        const actualPlayerCode = selectedPlayer?.code.trim() ?? "";
-        const gameweekStatId = selectedPlayerStats.gameweekStatID;
+        const goals = parseInt(goalsScoredRef.current?.value ?? "0");
+        const matchdayStatId = selectedPlayerStats.id;
 
-        await updatePlayerGoals(enteredCode, goalsEntered, actualPlayerCode, gameweekStatId);
+        if(selectedPlayerStats.player_id === loggedInPlayer?.id) await UpdateGoals(matchdayStatId, goals);
+        else alert("Not allowed")
         
         window.location.reload();
     }
@@ -288,13 +309,13 @@ export function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, resetState
                     htmlFor="textInput"
                     className="block text-lg font-bold text-red-700 dark:text-sky-400 mb-2"
                 >
-                {selectedPlayer?.firstname}
+                {selectedPlayer?.username}
                 </label>
                 <label
                     htmlFor="textInput"
                     className="block text-sm font-medium text-gray-700 dark:text-sky-700 mb-2"
                 >
-                how many goals did you score?
+                    how many goals did you score?
                 </label>
                 <input
                     type='number'
@@ -302,14 +323,7 @@ export function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, resetState
                     ref={goalsScoredRef}
                     name="textInput"
                     placeholder="goals"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <input
-                    type="text"
-                    id="textInput"
-                    ref={playerCodeRef}
-                    name="textInput"
-                    placeholder="your code"
+                    defaultValue={selectedPlayerStats.goals_scored ?? 0}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
             </div>
@@ -337,14 +351,15 @@ export function UpdateMotmNominationForm({selectedPlayer, gameweekId, resetState
         resetState: () => void,
     }
 ){
-    const playerCodeRef = useRef<HTMLInputElement>(null);
     const handleNominationRef = useRef<HTMLButtonElement>(null);
+
+    const {loggedInPlayer} = useContext(GlobalAppDataContext);
 
     const handleUpdateMotmNomination = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const playerCode = playerCodeRef.current?.value.trim() ?? "";
-        const nominatedPlayerId = selectedPlayer?.playerID ?? -1;
-        await updatePlayerMotmNomination(playerCode, nominatedPlayerId, gameweekId);
+        const nominatedPlayerId = selectedPlayer?.id ?? -1;
+        
+        await UpdateMotmNomination(loggedInPlayer?.id, nominatedPlayerId, gameweekId);
 
         window.location.reload();
     }
@@ -361,14 +376,6 @@ export function UpdateMotmNominationForm({selectedPlayer, gameweekId, resetState
                 >
                 Are you sure you want to nominate {selectedPlayer?.firstname} for MOTM?
                 </label>
-                <input
-                type="text"
-                id="textInput"
-                ref={playerCodeRef}
-                name="textInput"
-                placeholder="your code"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-sky-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
             </div>
             <button
                 type="submit"

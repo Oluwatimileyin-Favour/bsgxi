@@ -1,6 +1,6 @@
-import { Player } from "@prisma/client/wasm";
+import { PlayerSeasonStat } from "@/generated/prisma/client";
 
 export interface PlayerWithMonthPoint {
-    player: Player,
+    player: PlayerSeasonStat,
     monthPoints: number
 }
