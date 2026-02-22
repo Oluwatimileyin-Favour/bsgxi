@@ -4,6 +4,9 @@ FROM node:22
 # Set the working directory inside the container  
 WORKDIR /app  
 
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 # Copy package.json and package-lock.json to the container  
 COPY package*.json ./  
 

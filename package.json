@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "npm run prisma:generate && next build",
     "start": "next start",
-    "prisma:generate": "prisma generate",
+    "prisma:generate": "npx prisma generate",
     "lint": "next lint"
   },
   "dependencies": {
