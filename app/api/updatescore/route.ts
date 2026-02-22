@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { updateGameweek } from "@/app/services/db.service";
-import { Gameweek } from "@prisma/client";
 import ApiResponse from "@/app/interfaces/ApiResponse";
+import { Matchday } from "@/generated/prisma/client";
+import { updateMatchday } from "@/app/services/db.service";
 
 export async function POST(req: Request) {
   try {
     const {gameweekId, whitescore, blackscore}  = await req.json();
 
-    const dataToUpdate: Partial<Gameweek> = {whitescore, blackscore};
+    const dataToUpdate: Partial<Matchday> = {whitescore, blackscore};
     
-    const updatedGameweek: Gameweek = await updateGameweek(gameweekId, dataToUpdate);
+    const updatedGameweek: Matchday = await updateMatchday(gameweekId, dataToUpdate);
    
     const response: ApiResponse = {
       success: true,

@@ -1,10 +1,16 @@
 'use client'
 
-import { Gameweek, Player } from "@prisma/client";
-import { useRef, useState } from "react";
-import { adminCloseGameweek, adminDeleteGameweek, updateFullTimeScore, updateMotmShortlist } from "../services/api.service";
+import { Matchday, Player } from "@/generated/prisma/client";
+import { useContext, useRef, useState } from "react";
+import { GlobalAppDataContext } from "../context/GlobalAppDataContext";
+import { CloseMatchday, DeleteMatchday, UpdateFullTimeScore, UpdateMotmShortlist } from "../services/admin.service";
 
-export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeList}: {gameweekPlayerList: Player[], gameweek: Gameweek, nomineeList: Player[]}){
+export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeList}: {gameweekPlayerList: Player[], gameweek: Matchday, nomineeList: Player[]}){
+
+    //todo
+    //line 160
+
+    const {loggedInPlayer} = useContext(GlobalAppDataContext);
 
     const [nominees, updateNominees] = useState(nomineeList);
     const [removedNominees, updateRemovedNominees] = useState<Player[]>([]);
@@ -12,18 +18,21 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
     const [closeGameweekClicked, setCloseGameweekClicked] = useState(false);
     const [deleteGameweekClicked, setDeleteGameweekClicked] = useState(false);
 
-    const adminCodeRef = useRef<HTMLInputElement>(null);
-
     const onClickPlayer = (player: Player) => {
+
+        if(!loggedInPlayer?.is_admin) { alert("Not permitted"); return; }
+    
         const nomineesUpdate = [...nominees, player];
-        const gameweekPlayersUpdate = gameweekPlayers.filter(gameweekPlayer => gameweekPlayer.playerID != player.playerID);
+        const gameweekPlayersUpdate = gameweekPlayers.filter(gameweekPlayer => gameweekPlayer.id != player.id);
 
         updateNominees(nomineesUpdate);
         updateGameweekPlayers(gameweekPlayersUpdate);
     }
 
     const onclickNominatedPlayer = (nominee: Player) => {
-        const nomineesUpdate = nominees.filter(player => player.playerID != nominee.playerID);
+        if(!loggedInPlayer?.is_admin) { alert("Not permitted"); return; }
+        
+        const nomineesUpdate = nominees.filter(player => player.id != nominee.id);
         const gameweekPlayersUpdate = [...gameweekPlayers, nominee];
 
         updateNominees(nomineesUpdate);
@@ -39,12 +48,12 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
     }
 
     const handleMotmShortlistUpdate = async (e: { preventDefault: () => void; }) => {
-        const removedNomineesIds = removedNominees.map(player => player.playerID);
-        const nomineesIds = nominees.map(player => player.playerID);
-        const adminCodeValue = adminCodeRef.current?.value ?? "";
+        const removedNomineesIds = removedNominees.map(player => player.id);
+        const nomineesIds = nominees.map(player => player.id);
 
         e.preventDefault();
-        await updateMotmShortlist(adminCodeValue, removedNomineesIds, nomineesIds, gameweek.gameweekID);
+
+        if(loggedInPlayer?.is_admin) await UpdateMotmShortlist(gameweek.id, removedNomineesIds, nomineesIds);
         window.location.reload();
     }
 
@@ -70,7 +79,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                         <ul>
                             <h3 className="text-center font-bold text-xl text-rose-900 dark:text-rose-500">MOTM Nominees</h3>
                             {nominees.map( (player) => (
-                                <li key={player.playerID} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickNominatedPlayer(player)}>
+                                <li key={player.id} className="p-[10px] rounded-lg hover:bg-red-500 cursor-pointer text-center" onClick={() => onclickNominatedPlayer(player)}>
                                     {player.firstname}
                                 </li>
                             ))}
@@ -79,14 +88,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
                         <form 
                             onSubmit={handleMotmShortlistUpdate}
                             className="flex flex-col gap-3"
-                        >
-                            <input
-                                type="text"
-                                id="textInput"
-                                ref={adminCodeRef}
-                                placeholder="admin code"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
+                        >                      
 
                             <button className="px-4 py-2 rounded-2xl bg-rose-900 text-white hover:bg-rose-400 transition shadow-md h-10"
                                 onClick={() => {}}
@@ -99,7 +101,7 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
 
                     <div className="flex flex-col items-center gap-6">
 
-                        <UpdateFullTimeScoreForm gameweek={gameweek} />
+                        <UpdateFullTimeScoreForm matchday={gameweek} />
 
                         <button className="px-4 py-2 rounded-2xl bg-rose-900 dark:bg-red-500 text-white hover:bg-rose-400 transition shadow-md h-14 w-60 my-auto" 
                             onClick={() => setDeleteGameweekClicked(true)}
@@ -117,20 +119,20 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
             }
           
             {
-                closeGameweekClicked &&
+                closeGameweekClicked && loggedInPlayer?.is_admin &&
 
                 <CloseGameweekConfirmationForm 
                     resetChoices={resetChoices} 
-                    gameweek={gameweek} 
+                    matchday={gameweek} 
                 />
             } 
 
             {
-                deleteGameweekClicked &&
+                deleteGameweekClicked && loggedInPlayer?.is_admin &&
 
                 <DeleteGameweekConfirmationForm 
                     resetChoices={resetChoices} 
-                    gameweek={gameweek} 
+                    matchday={gameweek} 
                 />
             }           
         </div>
@@ -138,19 +140,22 @@ export default function ManageGameweek({gameweekPlayerList, gameweek, nomineeLis
 }
 
 
-function UpdateFullTimeScoreForm({gameweek}: {gameweek: Gameweek}) {
+function UpdateFullTimeScoreForm({matchday}: {matchday: Matchday}) {
 
-    const adminCodeRef = useRef<HTMLInputElement>(null);
     const whiteScoreRef = useRef<HTMLInputElement>(null);
     const blackScoreRef = useRef<HTMLInputElement>(null);
+
+    const {loggedInPlayer} = useContext(GlobalAppDataContext);
 
     const handleUpdateFullTimeScore = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
-        const adminCodeValue = adminCodeRef.current?.value ?? "";
         const whiteScore = parseInt(whiteScoreRef.current?.value ?? "0");
         const blackScore = parseInt(blackScoreRef.current?.value ?? "0");
-        updateFullTimeScore(adminCodeValue, gameweek.gameweekID, whiteScore, blackScore);
+        if (loggedInPlayer?.is_admin){
+            await UpdateFullTimeScore(matchday.id, whiteScore, blackScore);
+            window.location.reload(); // change to context update
+        }
     }
 
 
@@ -174,7 +179,7 @@ function UpdateFullTimeScoreForm({gameweek}: {gameweek: Gameweek}) {
                 ref={blackScoreRef}
                 name="textInput"
                 placeholder="team black"
-                defaultValue={gameweek.blackscore ?? 0}
+                defaultValue={matchday.blackscore ?? 0}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
 
@@ -184,16 +189,7 @@ function UpdateFullTimeScoreForm({gameweek}: {gameweek: Gameweek}) {
                 ref={whiteScoreRef}
                 name="textInput"
                 placeholder="team white"
-                defaultValue={gameweek.whitescore ?? 0}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-
-                <input
-                type="text"
-                id="textInput"
-                ref={adminCodeRef}
-                name="textInput"
-                placeholder="admin code"
+                defaultValue={matchday.whitescore ?? 0}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
             </div>
@@ -207,16 +203,18 @@ function UpdateFullTimeScoreForm({gameweek}: {gameweek: Gameweek}) {
     )
 }
 
-function CloseGameweekConfirmationForm({resetChoices, gameweek}: {resetChoices: () => void, gameweek: Gameweek}) {
+function CloseGameweekConfirmationForm({resetChoices, matchday}: {resetChoices: () => void, matchday: Matchday}) {
 
-    const adminCodeRef = useRef<HTMLInputElement>(null);
     const closeGameweekRef = useRef<HTMLButtonElement>(null);
 
-    async function handleCloseGameweek() {
-        const adminCodeEntered: string = adminCodeRef.current?.value ?? "";
-        const gameweekId: number  = gameweek.gameweekID;
+    const {season} = useContext(GlobalAppDataContext);
 
-        await adminCloseGameweek(adminCodeEntered, gameweekId);
+    async function handleCloseGameweek(e: { preventDefault: () => void; }) {
+         e.preventDefault();
+        const matchdayId: number  = matchday.id;
+
+        await CloseMatchday(matchdayId, season);
+        window.location.reload();
     }
 
     return (
@@ -231,14 +229,6 @@ function CloseGameweekConfirmationForm({resetChoices, gameweek}: {resetChoices: 
                 >
                 Are you sure you want to close the gameweek
                 </label>
-                <input
-                    type="text"
-                    id="textInput"
-                    ref={adminCodeRef}
-                    name="textInput"
-                    placeholder="admin code"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
             </div>
             <button
                 type="submit"
@@ -258,16 +248,17 @@ function CloseGameweekConfirmationForm({resetChoices, gameweek}: {resetChoices: 
 }
 
 
-function DeleteGameweekConfirmationForm({resetChoices, gameweek}: {resetChoices: () => void, gameweek: Gameweek}) {
+function DeleteGameweekConfirmationForm({resetChoices, matchday}: {resetChoices: () => void, matchday: Matchday}) {
 
     const adminCodeRef = useRef<HTMLInputElement>(null);
     const closeGameweekRef = useRef<HTMLButtonElement>(null);
 
-    async function handleDeleteGameweek() {
-        const adminCodeEntered: string = adminCodeRef.current?.value ?? "";
-        const gameweekId: number  = gameweek.gameweekID;
+    const {loggedInPlayer} = useContext(GlobalAppDataContext);
 
-        await adminDeleteGameweek(adminCodeEntered, gameweekId);
+    async function handleDeleteGameweek() {
+        const matchdayId: number  = matchday.id;
+
+        if(loggedInPlayer?.is_admin) await DeleteMatchday(matchdayId);
     }
 
     return (
@@ -282,14 +273,6 @@ function DeleteGameweekConfirmationForm({resetChoices, gameweek}: {resetChoices:
                 >
                 THIS WILL DELETE THE GAMEWEEK. IT IS NOT REVERSIBLE
                 </label>
-                <input
-                    type="text"
-                    id="textInput"
-                    ref={adminCodeRef}
-                    name="textInput"
-                    placeholder="admin code"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-red-400 dark:bg-inherit rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
             </div>
             <button
                 type="submit"

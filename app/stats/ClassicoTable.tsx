@@ -2,7 +2,6 @@ import { ClassicoTableRowData } from "../interfaces/classicoTableRowData";
 import { GenerateClassicoTableData } from "../util/classicoTableDataGenerator";
 import { fetchAllClassicos } from "../services/db.service";
 
-
 export default async function ClassicoTable() {
 
     const classicos = await fetchAllClassicos();

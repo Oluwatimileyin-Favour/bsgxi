@@ -1,6 +1,6 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -8,62 +8,123 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Gameweek {
-  gameweekID    Int            @id @db.TinyInt
-  date          DateTime       @db.Date
-  isactive      Boolean
-  gametype      String         @db.VarChar(20)
-  whitescore    Int?           @db.TinyInt
-  blackscore    Int?           @db.TinyInt
-  motm          Int?           @db.TinyInt
-  classicos     classicos[]
-  players       Player?        @relation(fields: [motm], references: [playerID], onDelete: NoAction, map: "fk_gameweeks_players_motm")
-  gameweekstats Gameweekstat[]
+model Classico {
+  id               Int       @id @default(autoincrement()) @db.SmallInt
+  matchday_id      Int       @db.SmallInt
+  newbies_goals    Int?      @db.TinyInt
+  youngblood_goals Int?      @db.TinyInt
+  oldies_goals     Int?      @db.TinyInt
+  matchdays        Matchday @relation(fields: [matchday_id], references: [id], onDelete: NoAction, map: "fk_classicos_matchday")
 
-  @@index([motm], map: "fk_gameweeks_players_motm_idx")
-  @@map("gameweeks")
+  @@index([matchday_id], map: "fk_classicos_matchday_idx")
+  @@map("classicos")
 }
 
-model Gameweekstat {
-  gameweekStatID                           Int      @id @default(autoincrement()) @db.SmallInt
-  gameweekID                               Int      @db.TinyInt
-  playerID                                 Int      @db.TinyInt
-  team                                     Int?     @db.TinyInt
-  goals_scored                             Int?     @db.TinyInt
-  nomineeID                                Int?     @db.TinyInt
-  points                                   Int?     @db.TinyInt
-  shortlisted                              Boolean?
-  gameweeks                                Gameweek @relation(fields: [gameweekID], references: [gameweekID], onDelete: NoAction, onUpdate: NoAction, map: "fk_gameweekstats_gameweeks_gameweekID")
-  players_gameweekstats_playerIDToplayers  Player   @relation("gameweekstats_playerIDToplayers", fields: [playerID], references: [playerID], onDelete: NoAction, map: "fk_gameweekstats_players")
-  players_gameweekstats_nomineeIDToplayers Player?  @relation("gameweekstats_nomineeIDToplayers", fields: [nomineeID], references: [playerID], onDelete: NoAction, map: "fk_gameweekstats_players_nomineeID")
+model MatchdayStat {
+  id                                         Int       @id @default(autoincrement())
+  season_id                                  Int?      @db.SmallInt
+  matchday_id                                Int       @db.SmallInt
+  player_id                                  Int       @db.SmallInt
+  team                                       Int?      @db.TinyInt
+  goals_scored                               Int?      @db.TinyInt
+  nominee_id                                 Int?      @db.SmallInt
+  points                                     Int?      @db.TinyInt
+  shortlisted                                Boolean?
+  matchdays                                  Matchday @relation(fields: [matchday_id], references: [id], onDelete: NoAction, map: "fk_matchdaystats_matchday")
+  players_matchday_stats_nominee_idToplayers Player?  @relation("matchday_stats_nominee_idToplayers", fields: [nominee_id], references: [id], onDelete: NoAction, map: "fk_matchdaystats_nominee")
+  players_matchday_stats_player_idToplayers  Player   @relation("matchday_stats_player_idToplayers", fields: [player_id], references: [id], onDelete: NoAction, map: "fk_matchdaystats_player")
+  seasons                                    Season?  @relation(fields: [season_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_matchdaystats_season")
 
-  @@index([gameweekID], map: "fk_gameweekstats_gameweeks_gameweekID_idx")
-  @@index([playerID], map: "fk_gameweekstats_players_idx")
-  @@index([nomineeID], map: "fk_gameweekstats_players_nomineeID_idx")
-  @@map("gameweekstats")
+  @@index([matchday_id], map: "fk_matchdaystats_matchday_idx")
+  @@index([nominee_id], map: "fk_matchdaystats_nominee_idx")
+  @@index([player_id], map: "fk_matchdaystats_player_idx")
+  @@index([season_id], map: "fk_matchdaystats_season_idx")
+  @@map("matchday_stats")
+}
+
+model Matchday {
+  id             Int              @id @db.SmallInt
+  season_id      Int?             @db.SmallInt
+  date           DateTime         @db.Date
+  isactive       Boolean
+  gametype       String           @db.VarChar(20)
+  whitescore     Int?             @db.TinyInt
+  blackscore     Int?             @db.TinyInt
+  motm           Int?             @db.SmallInt
+  classicos      Classico[]
+  matchday_stats MatchdayStat[]
+  players        Player?         @relation(fields: [motm], references: [id], onDelete: NoAction, map: "fk_matchdays_motm")
+  seasons        Season?         @relation(fields: [season_id], references: [id], onDelete: NoAction, map: "fk_matchdays_season")
+
+  @@index([motm], map: "fk_matchdays_motm_idx")
+  @@index([season_id], map: "fk_matchdays_season_idx")
+  @@map("matchdays")
+}
+
+model PlayerSeasonStat {
+  id           Int     @id @default(autoincrement())
+  season_id    Int     @db.SmallInt
+  player_id    Int     @db.SmallInt
+  username     String? @db.VarChar(45)
+  goals        Int?    @db.TinyInt
+  points       Int?    @db.TinyInt
+  games_played Int?    @db.TinyInt
+  players      Player @relation(fields: [player_id], references: [id], onDelete: NoAction, map: "fk_player_seasonstats")
+  seasons      Season @relation(fields: [season_id], references: [id], onDelete: NoAction, map: "fk_season_seasonstats")
+
+  @@index([player_id], map: "fk_player_seasonstats_idx")
+  @@index([season_id], map: "fk_season_seasonstats_idx")
+  @@map("player_season_stats")
 }
 
 model Player {
-  playerID                                       Int            @id @db.TinyInt
-  code                                           String         @unique(map: "code_UNIQUE") @db.Char(5)
-  firstname                                      String         @db.VarChar(45)
-  lastname                                       String         @db.VarChar(45)
-  totalpoints                                    Int?           @db.TinyInt
-  totalgoals                                     Int?           @db.TinyInt
-  gameweeks                                      Gameweek[]
-  gameweekstats_gameweekstats_playerIDToplayers  Gameweekstat[] @relation("gameweekstats_playerIDToplayers")
-  gameweekstats_gameweekstats_nomineeIDToplayers Gameweekstat[] @relation("gameweekstats_nomineeIDToplayers")
+  id                                                Int                   @id @default(autoincrement()) @db.SmallInt
+  provider_id                                       Int?                  @unique(map: "provider_id_UNIQUE") @db.SmallInt
+  code                                              String                @unique(map: "code_UNIQUE") @db.Char(5)
+  firstname                                         String?               @db.VarChar(45)
+  lastname                                          String?               @db.VarChar(45)
+  username                                          String?               @db.VarChar(45)
+  email                                             String?               @db.VarChar(45)
+  status_id                                         Int?                  @db.SmallInt
+  is_admin                                          Boolean?
+  totalpoints                                       Int?                  @db.TinyInt
+  totalgoals                                        Int?                  @db.TinyInt
+  last_login                                        DateTime?             @db.Date
+  date_registered                                   DateTime?             @db.Date
+  profile_picture                                   String?               @db.VarChar(200)
+  matchday_stats_matchday_stats_nominee_idToplayers MatchdayStat[]      @relation("matchday_stats_nominee_idToplayers")
+  matchday_stats_matchday_stats_player_idToplayers  MatchdayStat[]      @relation("matchday_stats_player_idToplayers")
+  matchdays                                         Matchday[]
+  player_season_stats                               PlayerSeasonStat[]
+  status                                            Status?               @relation(fields: [status_id], references: [id], onDelete: NoAction, map: "fk_player_status")
+  seasons_seasons_bsgdor_winner_idToplayers         Season[]             @relation("seasons_bsgdor_winner_idToplayers")
+  seasons_seasons_goldenboot_winner_idToplayers     Season[]             @relation("seasons_goldenboot_winner_idToplayers")
 
+  @@index([status_id], map: "fk_player_status_idx")
   @@map("players")
 }
 
-model classicos {
-  classicoID       Int      @id @default(autoincrement()) @db.TinyInt
-  gameweekID       Int      @db.TinyInt
-  newbies_goals    Int?     @db.TinyInt
-  youngblood_goals Int?     @db.TinyInt
-  oldies_goals     Int?     @db.TinyInt
-  gameweeks        Gameweek @relation(fields: [gameweekID], references: [gameweekID], onDelete: NoAction, map: "gameweekID")
+model Season {
+  id                                            Int                   @id @db.SmallInt
+  year                                          String                @db.VarChar(10)
+  bsgdor_winner_id                              Int?                  @db.SmallInt
+  goldenboot_winner_id                          Int?                  @db.SmallInt
+  no_games_played                               Int?                  @db.TinyInt
+  matchday_stats                                MatchdayStat[]
+  matchdays                                     Matchday[]
+  player_season_stats                           PlayerSeasonStat[]
+  players_seasons_bsgdor_winner_idToplayers     Player?              @relation("seasons_bsgdor_winner_idToplayers", fields: [bsgdor_winner_id], references: [id], onDelete: NoAction, map: "fk_seasons_bsgdorwinner")
+  players_seasons_goldenboot_winner_idToplayers Player?              @relation("seasons_goldenboot_winner_idToplayers", fields: [goldenboot_winner_id], references: [id], onDelete: NoAction, map: "fk_seasons_goldenbootwinner")
 
-  @@index([gameweekID], map: "gameweekID_idx")
+  @@index([bsgdor_winner_id], map: "fk_seasons_bsgdorwinner_idx")
+  @@index([goldenboot_winner_id], map: "fk_seasons_goldenbootwinner_idx")
+  @@map("seasons")
+}
+
+model Status {
+  id          Int       @id @db.SmallInt
+  description String?   @db.VarChar(45)
+  players     Player[]
+
+  @@map("status")
 }

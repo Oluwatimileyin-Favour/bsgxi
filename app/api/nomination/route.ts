@@ -1,8 +1,8 @@
 import { ApiRouteActions } from "@/app/lib/ApiRouteActions";
-import { findGameweekStatsByPlayerIdAndGameweekId, findPlayerByCode, updateGameweekStat, updateGameweekStatsByPlayerIdsAndGameweekID } from "@/app/services/db.service";
-import { Gameweekstat, Player } from "@prisma/client";
+import { findGameweekStatsByPlayerIdAndGameweekId, findPlayerByCode, updateGameweekStatsByPlayerIdsAndGameweekID, updateMatchdayStat } from "@/app/services/db.service";
 import { NextResponse } from "next/server";
 import ApiResponse from "@/app/interfaces/ApiResponse";
+import { MatchdayStat, Player } from "@/generated/prisma/client";
 
 export async function POST(req: Request) {
   try { 
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
     if(body.action === ApiRouteActions.ADMIN_SELECT_NOMINEES){
       const {playerIds, gameweekId} = body.payload;
-      const dataToUpdate: Partial<Gameweekstat> = {shortlisted: true, points: 2};
+      const dataToUpdate: Partial<MatchdayStat> = {shortlisted: true, points: 2};
 
       if(gameweekId === null || playerIds === null) {
         const response: ApiResponse = {
@@ -40,9 +40,9 @@ export async function POST(req: Request) {
         return NextResponse.json(response, { status: 400 }); 
       }
 
-      const dataToUpdate: Partial<Gameweekstat> = {nomineeID: nomineeId};
+      const dataToUpdate: Partial<MatchdayStat> = {nominee_id: nomineeId};
 
-      const updatedGameweekStat = await updateGameweekStat(gameweekStatId,  dataToUpdate)
+      const updatedGameweekStat = await updateMatchdayStat(gameweekStatId,  dataToUpdate)
 
       const response: ApiResponse = {
         success: true,
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
         return NextResponse.json(response, { status: 404 }); 
       }
 
-      const playerGameweekstat: Gameweekstat | null = await findGameweekStatsByPlayerIdAndGameweekId(player.playerID, gameweekId); 
+      const playerGameweekstat: MatchdayStat | null = await findGameweekStatsByPlayerIdAndGameweekId(player.id, gameweekId); 
 
       if (playerGameweekstat) {
         const response: ApiResponse = {
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
     else if(body.action === ApiRouteActions.REMOVE_NOMINEES){
       const playerIds: number[] = body.payload.playerIds;
       const gameweekId: number = body.payload.gameweekId;
-      const dataToUpdate: Partial<Gameweekstat> = {shortlisted: false, points: 1};
+      const dataToUpdate: Partial<MatchdayStat> = {shortlisted: false, points: 1};
 
       const updatedGameweekStats = await updateGameweekStatsByPlayerIdsAndGameweekID(playerIds, gameweekId, dataToUpdate);
 

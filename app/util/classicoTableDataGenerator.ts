@@ -1,7 +1,7 @@
-import { classicos } from "@prisma/client";
+import { Classico } from "@/generated/prisma/client";
 import { ClassicoTableRowData } from "../interfaces/classicoTableRowData";
 
-export function GenerateClassicoTableData(classicos: classicos[]): ClassicoTableRowData[] {
+export function GenerateClassicoTableData(classicos: Classico[]): ClassicoTableRowData[] {
 
     //TODO
     //can this be cleaned up

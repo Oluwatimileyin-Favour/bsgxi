@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { updateGameweekStat } from "@/app/services/db.service";
 import { ApiRouteActions } from "@/app/lib/ApiRouteActions";
 import ApiResponse from "@/app/interfaces/ApiResponse";
+import { updateMatchdayStat } from "@/app/services/db.service";
 
 export async function POST(req: Request) {
   try {
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       }
 
       const dataToUpdate = { goals_scored: parseInt(goalsScored)};
-      const updatedGameweekStat = updateGameweekStat(gameweekStatId, dataToUpdate);
+      const updatedGameweekStat = updateMatchdayStat(gameweekStatId, dataToUpdate);
     
       const response: ApiResponse = {
         success: true,

@@ -1,16 +1,17 @@
-import { Gameweek, Player } from "@prisma/client";
+import { Matchday, Player } from "@/generated/prisma/client";
+import ApiResponse from "../interfaces/ApiResponse";
 import { ApiRouteActions } from "../lib/ApiRouteActions";
 import { GameweekType } from "../lib/GameweekTypes";
 import generateAdminCode from "../util/generateCode";
+import { getMatchDayCountBySeason } from "./db.service";
 import { sendPostRequest } from "./http.service";
-import ApiResponse from "../interfaces/ApiResponse";
 
 const adminCode =  generateAdminCode();
 
 //TODO
 //Show specific error for multiple MOTM
 
-async function activateGameweek(date: string, nextGameweek: number, gameType: GameweekType){
+async function activateGameweek(date: string, gameType: GameweekType){
 
     if(date && date === ""){
         alert("Select Date");
@@ -24,8 +25,11 @@ async function activateGameweek(date: string, nextGameweek: number, gameType: Ga
         return;
     }
 
-    const gameweek: Gameweek = {
-        gameweekID: nextGameweek,
+    const numOfMatchdays: number = await getMatchDayCountBySeason(2);
+
+    const gameweek: Matchday = {
+        id: numOfMatchdays + 36,    //TODO UPDATE
+        season_id: 2,
         date: gameWeekDate,
         isactive: true,
         gametype: gameType,
@@ -41,12 +45,12 @@ async function activateGameweek(date: string, nextGameweek: number, gameType: Ga
             return res.result;
         } 
         else {
-            throw("resuest to activate a new gameweek failed");
+            throw("request to activate a new gameweek failed");
         }
     } 
 
-    catch {
-        alert("There was an issue with activating a new gameweek");
+    catch(err) {
+        alert(err);
     }
 }
 
@@ -72,14 +76,9 @@ export async function adminDeleteGameweek(adminCodeValue: string, gameweekId: nu
     }   
 }
 
-export async function saveTeamSheets(adminCodeValue: string, date: string, nextGameweek: number, gameType: GameweekType, teamBlack: Player[], teamWhite: Player[], teamRed: Player[], threeTeamGamePlayers: Player[]) { 
+export async function saveTeamSheets(date: string, gameType: GameweekType, teamBlack: Player[], teamWhite: Player[], teamRed: Player[], threeTeamGamePlayers: Player[]) { 
 
-    if(adminCodeValue != adminCode){
-        alert("Incorrect Code");
-        return;
-    }
-
-    const newGameweek = await activateGameweek(date, nextGameweek, gameType);
+    const newGameweek: Matchday = await activateGameweek(date, gameType);
     
     if(!newGameweek){
         alert("Error saving teams");
@@ -90,13 +89,13 @@ export async function saveTeamSheets(adminCodeValue: string, date: string, nextG
         let teamInfo = {};
 
         if(gameType === GameweekType.Regular){
-            teamInfo = {gameweekId: newGameweek.gameweekID, whiteteam: teamWhite, blackteam: teamBlack};
+            teamInfo = {gameweekId: newGameweek.id, whiteteam: teamWhite, blackteam: teamBlack};
         }
         else if(gameType === GameweekType.Classico){
-            teamInfo = {gameweekId: newGameweek.gameweekID, whiteteam: teamWhite, blackteam: teamBlack, redteam: teamRed};
+            teamInfo = {gameweekId: newGameweek.id, whiteteam: teamWhite, blackteam: teamBlack, redteam: teamRed};
         }
         else if(gameType === GameweekType.ThreeTeam){ //for threeteam games, put everyone on white team
-            teamInfo = {gameweekId: newGameweek.gameweekID, whiteteam: threeTeamGamePlayers, blackteam: []}
+            teamInfo = {gameweekId: newGameweek.id, whiteteam: threeTeamGamePlayers, blackteam: []}
         }
         
         const body = {action: ApiRouteActions.SAVE_TEAMS_ATTENDANCE, payload: teamInfo};
@@ -112,7 +111,7 @@ export async function saveTeamSheets(adminCodeValue: string, date: string, nextG
     catch {
 
         // gameweek is created first before teams are saved, so delete the created gameweek if error occurs
-        if(newGameweek) adminDeleteGameweek(generateAdminCode(), newGameweek.gameweekID, true);
+        if(newGameweek) adminDeleteGameweek(generateAdminCode(), newGameweek.id, true);
         alert("There was an issue with creating a new gameweek");
     }
 }
@@ -207,10 +206,10 @@ export async function updatePlayerMotmNomination(playerCode: string, nominatedPl
 
 export async function updateFullTimeScore(adminCodeValue: string, gameweekId: number, whitescore: number, blackscore: number) {
 
-    if(adminCodeValue != adminCode){
-        alert("Incorrect Code");
-        return;
-    }
+    // if(adminCodeValue != adminCode){
+    //     alert("Incorrect Code");
+    //     return;
+    // }
     
     try {
         const body = {gameweekId, whitescore, blackscore};
@@ -231,10 +230,10 @@ export async function updateFullTimeScore(adminCodeValue: string, gameweekId: nu
 export async function updateMotmShortlist(adminCodeValue: string, removedNomineesIds: number[], nomineesIds: number[], gameweekId: number) {
 
 
-    if(adminCodeValue != adminCode){
-        alert("Incorrect Code");
-        return;
-    }
+    // if(adminCodeValue != adminCode){
+    //     alert("Incorrect Code");
+    //     return;
+    // }
 
     try{
         if(removedNomineesIds.length > 0) {
