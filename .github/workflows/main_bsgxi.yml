@@ -36,7 +36,7 @@ jobs:
         tags: bsgxicontainer.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_4877e766e240428dbe1a6dc646d63327 }}/bsg-xi:${{ github.sha }}
         file: ./Dockerfile
         build-args: |
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          DATABASE_URL=mysql://fake:fake@localhost:3306/fake
 
   deploy:
     runs-on: ubuntu-latest
