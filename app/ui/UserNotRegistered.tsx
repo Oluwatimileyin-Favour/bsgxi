@@ -18,6 +18,7 @@ export default function UserNotRegistered({_playerHasRegistered}: {_playerHasReg
 
     const [foundAccount, setFoundAccount] = useState<Player | null>(null);
     const [playerHasRegistered, setPlayerHasRegistered] = useState<boolean>(_playerHasRegistered);
+    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
     const router = useRouter();
 
@@ -103,7 +104,14 @@ export default function UserNotRegistered({_playerHasRegistered}: {_playerHasReg
                                     placeholder="Display name"
                                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                            <button className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500" onClick={handleNewRegistration}>Register</button>
+                            <button className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500" onClick={() => {
+                                const username = userNameRef_newUsers.current?.value ?? "";
+                                if(username === ""){
+                                    alert("Please enter username");
+                                    return;
+                                }
+                                setShowConfirmModal(true);
+                            }}>Register</button>
                         </div>
                     }
 
@@ -124,6 +132,17 @@ export default function UserNotRegistered({_playerHasRegistered}: {_playerHasReg
                             onConfirm={handleConfirmLinkage}
                             onCancel={handleCancelLinkage}
                             userNameRef={userNameRef}
+                        />
+                    )}
+
+                    {showConfirmModal && (
+                        <ConfirmRegistration 
+                            username={userNameRef_newUsers.current?.value ?? ""}
+                            onConfirm={() => {
+                                handleNewRegistration();
+                                setShowConfirmModal(false);
+                            }}
+                            onCancel={() => setShowConfirmModal(false)}
                         />
                     )}
                 </div>
@@ -156,6 +175,39 @@ function ConfirmAccountLinkage({account, onConfirm, onCancel, userNameRef}:{acco
                         placeholder="Display name"
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                </div>
+
+                <div className="flex gap-3">
+                    <button 
+                        onClick={onCancel}
+                        className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white py-2 px-4 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={onConfirm}
+                        className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+
+function ConfirmRegistration({username, onConfirm, onCancel}:{username: string, onConfirm: () => void, onCancel: () => void}){
+
+    return(
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm w-full mx-4">
+                <h2 className="text-2xl font-bold mb-4 text-center">Confirm Registration {Emojis.needToLoginEmoji}</h2>
+                <div className="mb-6 text-center">
+                    <p className="text-gray-600 dark:text-gray-300 mb-2">This is for NEW players only. Are you sure you want to register with this username?</p>
+                    <p className="text-xl font-semibold text-blue-600 dark:text-blue-400">
+                        {username}
+                    </p>
                 </div>
 
                 <div className="flex gap-3">
