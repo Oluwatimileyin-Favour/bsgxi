@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 // This function can be marked `async` if using `await` inside
 export function proxy(request: NextRequest) {
 
-  const userIsLoggedIn: boolean = request.cookies.has('next-auth.session-token');
+  const userIsLoggedIn: boolean = request.cookies.has('next-auth.session-token') || request.cookies.has('__Secure-next-auth.session-token'); // find better way
   const userIsAGuestUser: boolean = request.cookies.has('Guest');
 
 
