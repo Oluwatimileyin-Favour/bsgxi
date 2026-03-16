@@ -10,7 +10,19 @@ interface GlobalAppData {
     loggedInPlayer: Player | undefined,
     season: number,
     playersSeasonStats: PlayerSeasonStat[],
-    setSeason: (_year: number) => void
+    setSeason: (_year: number) => void,
+    isLoading: boolean
 }
 
-export const GlobalAppDataContext = createContext<GlobalAppData>({players: [], matchdays: [], matchdayStats: [], loggedInPlayer: undefined, season: 2, playersSeasonStats: [], setSeason : (_year: number) => {}});
+export const GlobalAppDataContext = createContext<GlobalAppData>(
+    {
+        players: [], 
+        matchdays: [], 
+        matchdayStats: [], 
+        loggedInPlayer: undefined, 
+        season: 2, 
+        playersSeasonStats: [], 
+        setSeason : (_year: number) => {},
+        isLoading: false
+    }
+);
