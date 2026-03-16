@@ -6,6 +6,7 @@ import { GlobalAppDataContext } from "../context/GlobalAppDataContext";
 import Emojis from "../lib/emojis";
 import { GameweekType } from "../lib/GameweekTypes";
 import { UpdateGoals, UpdateMotmNomination } from "../services/player.service";
+import { LoadingSpinner } from "../ui/LoadingSpinner";
 
 export default function Teamsheet({selectedGameweekIdx}: {selectedGameweekIdx: number}){
 
@@ -30,6 +31,7 @@ export default function Teamsheet({selectedGameweekIdx}: {selectedGameweekIdx: n
     const [playerIsSelected, updatePlayerSelectionStatus] = useState<boolean>(false);
     const [nominateForMotmClicked, updateNominateForMotmClickedStatus] = useState<boolean>(false);
     const [enterGoalsClicked, updateEnterGoalsClickedStatus] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     
     const selectedPlayer = players.find(player => player.id === selectedPlayerStats.player_id);
 
@@ -64,6 +66,10 @@ export default function Teamsheet({selectedGameweekIdx}: {selectedGameweekIdx: n
     return (
         <div className="flex justify-center mt-5 w-[95%] lg:max-h-[320px] overflow-y-auto">
             {/* Would show only one of the blocks below depending on the condition met */}
+
+            {
+                isLoading && <LoadingSpinner/>
+            }
 
             {
                 !playerIsSelected && matchday.gametype.trim() === GameweekType.Regular &&
@@ -117,6 +123,7 @@ export default function Teamsheet({selectedGameweekIdx}: {selectedGameweekIdx: n
                 <UpdateGoalsForm
                     selectedPlayer={selectedPlayer}
                     selectedPlayerStats={selectedPlayerStats}
+                    setIsLoading={setIsLoading}
                     resetState={resetState}
                 />
             }
@@ -127,6 +134,7 @@ export default function Teamsheet({selectedGameweekIdx}: {selectedGameweekIdx: n
                 <UpdateMotmNominationForm
                     selectedPlayer={selectedPlayer}
                     gameweekId={matchday.id}  
+                    setIsLoading={setIsLoading}
                     resetState={resetState} 
                 />
             }
@@ -276,11 +284,12 @@ function ChooseActionMenu({updateNominateForMotmClickedStatus, updateEnterGoalsS
     )
 }
 
-export function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, resetState}: 
+export function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, setIsLoading, resetState}: 
     {
         selectedPlayer: Player | undefined,
         selectedPlayerStats: MatchdayStat,
-        resetState: () => void,
+        setIsLoading: (value: boolean) => void,
+        resetState: () => void
     }
 ){
     const goalsScoredRef = useRef<HTMLInputElement>(null);
@@ -293,8 +302,14 @@ export function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, resetState
         const goals = parseInt(goalsScoredRef.current?.value ?? "0");
         const matchdayStatId = selectedPlayerStats.id;
 
-        if(selectedPlayerStats.player_id === loggedInPlayer?.id) await UpdateGoals(matchdayStatId, goals);
-        else alert("Not allowed")
+        if(selectedPlayerStats.player_id === loggedInPlayer?.id){
+            setIsLoading(true);
+            await UpdateGoals(matchdayStatId, goals);
+            setIsLoading(false);
+        } 
+        else {
+            alert("Not allowed");
+        }
         
         window.location.reload();
     }
@@ -344,10 +359,11 @@ export function UpdateGoalsForm({selectedPlayer, selectedPlayerStats, resetState
     )
 }
 
-export function UpdateMotmNominationForm({selectedPlayer, gameweekId, resetState} : 
+export function UpdateMotmNominationForm({selectedPlayer, gameweekId, setIsLoading, resetState} : 
     {
         selectedPlayer: Player | undefined,
         gameweekId: number,
+        setIsLoading: (value: boolean) => void
         resetState: () => void,
     }
 ){
@@ -359,7 +375,9 @@ export function UpdateMotmNominationForm({selectedPlayer, gameweekId, resetState
         e.preventDefault();
         const nominatedPlayerId = selectedPlayer?.id ?? -1;
         
+        setIsLoading(true);
         await UpdateMotmNomination(loggedInPlayer?.id, nominatedPlayerId, gameweekId);
+        setIsLoading(false);
 
         window.location.reload();
     }

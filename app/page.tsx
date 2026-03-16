@@ -1,17 +1,18 @@
 'use client'
 
-import { useContext, useEffect, useState } from "react";
-import { GlobalAppDataContext} from "./context/GlobalAppDataContext";
+import { useContext, useState } from "react";
+import { GlobalAppDataContext } from "./context/GlobalAppDataContext";
 import GameweekDetails from "./home/GameweekDetails";
+import GreetUser from "./home/GreetUser";
 import PotmLeaderboard from "./home/PotmLeaderboard";
 import Teamsheet from "./home/Teamsheet";
 import Emojis from "./lib/emojis";
 import Pager from "./ui/Pager";
-import GreetUser from "./home/GreetUser";
+import { LoadingSpinner } from "./ui/LoadingSpinner";
 
 export default function App() {
 
-    const {matchdays} = useContext(GlobalAppDataContext);
+    const {matchdays, isLoading} = useContext(GlobalAppDataContext);
     
     const lastGameweekIdx: number = matchdays.length - 1;
     const seasonHasBegun: boolean = lastGameweekIdx >= 0;
@@ -27,6 +28,7 @@ export default function App() {
             <div className="flex flex-col gap-6 h-full">
                 <GreetUser/>
                 <div className="flex flex-col h-full justify-around items-center lg:flex-row py-4 gap-6">
+                    {isLoading && <LoadingSpinner/>}
                     {
                         !seasonHasBegun ?                    
                             <div className="flex h-[400px] justify-center items-center p-10">

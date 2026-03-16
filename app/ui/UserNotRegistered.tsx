@@ -8,6 +8,7 @@ import { LinkAccounts, RegisterNewPlayer } from "../services/application.service
 import { findPlayerByCode } from "../services/db.service";
 import ViewAsGuestButton from "./ViewAsGuestButton";
 import { inter } from "./fonts";
+import { Oval } from 'react-loader-spinner';
 
 
 export default function UserNotRegistered({_playerHasRegistered}: {_playerHasRegistered: boolean}){
@@ -19,6 +20,7 @@ export default function UserNotRegistered({_playerHasRegistered}: {_playerHasReg
     const [foundAccount, setFoundAccount] = useState<Player | null>(null);
     const [playerHasRegistered, setPlayerHasRegistered] = useState<boolean>(_playerHasRegistered);
     const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const router = useRouter();
 
@@ -38,12 +40,15 @@ export default function UserNotRegistered({_playerHasRegistered}: {_playerHasReg
                 const username = userNameRef?.current?.value ?? "";
                 if(username && username.length > 0) foundAccount.username = username;
 
+                setIsLoading(true);
                 await LinkAccounts(foundAccount);
+                setIsLoading(false);
                 alert("Update Successful");
                 router.refresh();
             }
             catch{
                 alert("There was error linking your accounts");
+                setIsLoading(false);
             }
         }
         else{
@@ -61,12 +66,14 @@ export default function UserNotRegistered({_playerHasRegistered}: {_playerHasReg
         }
 
         try{
+            setIsLoading(true);
             await RegisterNewPlayer(username);
             setPlayerHasRegistered(true);
-
+            setIsLoading(false);
         }
         catch{
             alert("There was error registering your account");
+            setIsLoading(false);
         }
     }
 
@@ -76,15 +83,16 @@ export default function UserNotRegistered({_playerHasRegistered}: {_playerHasReg
             playerCodeRef.current.value = "";
         }
     }
-
-    // another modal for new users
-    // username is required
-    // first and last name optional
-    //admin will review and make player active on db side
+    
     return (
         <html lang="en" className="h-[100vh]">
             <body className={`${inter.className} antialiased h-[100%] text-gray-700 dark:bg-[#1E1E1E] dark:text-gray-300`}>
 
+                {
+                    isLoading && 
+                    <LoadingState/>
+                }
+                
                 <div className="flex flex-col p-8 gap-4 h-full items-center justify-center">  
                     <h1 className='text-4xl font-bold mb-4'>Eish! You're not registered {Emojis.needToRegister}</h1>
                     <h2>New users, Admin has to approve your registration {Emojis.viewAsAGuest}</h2>
@@ -126,7 +134,7 @@ export default function UserNotRegistered({_playerHasRegistered}: {_playerHasReg
                         <button className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500" onClick={handleLinkAccounts}>Link Accounts</button>
                     </div>
                     
-                    {foundAccount && (
+                    {foundAccount && !isLoading && (
                         <ConfirmAccountLinkage 
                             account={foundAccount} 
                             onConfirm={handleConfirmLinkage}
@@ -135,7 +143,7 @@ export default function UserNotRegistered({_playerHasRegistered}: {_playerHasReg
                         />
                     )}
 
-                    {showConfirmModal && (
+                    {showConfirmModal && !isLoading && (
                         <ConfirmRegistration 
                             username={userNameRef_newUsers.current?.value ?? ""}
                             onConfirm={() => {
@@ -225,6 +233,23 @@ function ConfirmRegistration({username, onConfirm, onCancel}:{username: string, 
                     </button>
                 </div>
             </div>
+        </div>
+    )
+}
+
+function LoadingState(){
+    return(
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                 <Oval
+                    height={80}
+                    width={80}
+                    color="#4fa94d"
+                    visible={true}
+                    ariaLabel="oval-loading"
+                    secondaryColor="#4fa94d"
+                    strokeWidth={2}
+                    strokeWidthSecondary={2}
+                    />
         </div>
     )
 }

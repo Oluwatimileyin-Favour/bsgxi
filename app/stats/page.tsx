@@ -1,14 +1,14 @@
 'use client'
 
+import { useContext, useState } from "react";
+import { GlobalAppDataContext } from "../context/GlobalAppDataContext";
 import { LeaderboardConfig } from "../interfaces/LeaderboardConfig";
 import Emojis from "../lib/emojis";
-import Leaderboard from "../ui/Leaderboard";
 import { LeaderBoardColours } from "../lib/TailwindColours";
-import { GlobalAppDataContext } from "../context/GlobalAppDataContext";
-import { useContext, useState } from "react";
-import { GetPlayersSeasonStats } from "../services/player.service";
 import { getAllSeasonYears, getSeasonYear } from "../services/date.service";
 import Dropdown from "../ui/Dropdown";
+import Leaderboard from "../ui/Leaderboard";
+import { LoadingSpinner } from "../ui/LoadingSpinner";
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +16,7 @@ export default function StatsPage(){
 
     //TODO
     //better way to handle leaderboard colors
-    const {playersSeasonStats, season, setSeason} = useContext(GlobalAppDataContext);
+    const {playersSeasonStats, season, setSeason, isLoading} = useContext(GlobalAppDataContext);
 
     const [potmLeaderboardYear, setPotmLeaderboardYear] = useState<string>(getSeasonYear(season).toString());
 
@@ -51,13 +51,17 @@ export default function StatsPage(){
     };
 
     return (
-        <div className="flex flex-col justify-center min-h-[100%] gap-2 py-2">
-            {/* <ClassicoTable/> */}
-            <Dropdown menuItems={getAllSeasonYears()} selectedItem={potmLeaderboardYear} reactToSelection={handleYearChange} displayTextSize="text-xl"></Dropdown>
-            <div className="flex flex-col p-5 justify-around items-center gap-3 md:flex-row md:justify-center">
-                <Leaderboard leaderboardConfig={ballondOrLeaderboardConfig}></Leaderboard>
-                <Leaderboard leaderboardConfig={goldenBootLeaderboardConfig}></Leaderboard>  
+        <>
+            {isLoading && <LoadingSpinner/>}
+
+            <div className="flex flex-col justify-center min-h-[100%] gap-2 py-2">
+                    {/* <ClassicoTable/> */}
+                    <Dropdown menuItems={getAllSeasonYears()} selectedItem={potmLeaderboardYear} reactToSelection={handleYearChange} displayTextSize="text-xl"></Dropdown>
+                    <div className="flex flex-col p-5 justify-around items-center gap-3 md:flex-row md:justify-center">
+                        <Leaderboard leaderboardConfig={ballondOrLeaderboardConfig}></Leaderboard>
+                        <Leaderboard leaderboardConfig={goldenBootLeaderboardConfig}></Leaderboard>  
+                    </div>
             </div>
-        </div>
+        </>   
     )
 }
